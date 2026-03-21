@@ -53,6 +53,10 @@ typings/
 .env
 .env.test
 
+# WhatsApp Web JS session & cache (LocalAuth)
+.wwebjs_auth/
+.wwebjs_cache/
+
 # Serverless directories
 .serverless/
 
