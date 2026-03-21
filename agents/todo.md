@@ -1,8 +1,9 @@
-# Current Phase: Phase 7 Notification Service & OTP Endpoints (Completed)
+# Current Phase: Phase 8 Public Client Endpoints (Completed)
 
 ## Tasks
-- [x] Gather Notification Spec logic (leases, locks, dispatch loop)
-- [x] Create implementation plan for Phase 7 (Backend Only)
+- [x] Analyze `demo-flows` identifying CryptoKey instantiation bottlenecks
+- [x] Create implementation plan for Phase 8 mapping legacy protocols
 - [x] Receive user confirmation for the plan
-- [x] Implement Phase 7 Backend Logic (OTP Service, Middleware, API Paths)
-- [x] Implement Phase 7 Integration Tests (Race condition simulations)
+- [x] Execute `blindrsa.service.js` translating binary payloads smoothly
+- [x] Setup Public APIs handling canonical validations securely
+- [x] Create rigorous unauthenticated simulations mapping entire chronological feedback journeys
