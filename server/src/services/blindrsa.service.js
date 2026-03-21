@@ -42,6 +42,17 @@ export const signToken = async (privateKeyPem, blindedMsgB64) => {
   return Buffer.from(blindSig).toString('base64');
 };
 
+export const signTokenWithThrowawayKey = async (blindedMsgB64) => {
+  const { privateKey } = await crypto.webcrypto.subtle.generateKey(
+    { name: 'RSA-PSS', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-384' },
+    true,
+    ['sign']
+  );
+  const blindedMsgBytes = new Uint8Array(Buffer.from(blindedMsgB64, 'base64'));
+  const blindSig = await suite.blindSign(privateKey, blindedMsgBytes);
+  return Buffer.from(blindSig).toString('base64');
+};
+
 export const verifySignature = async (publicKeyPem, messageB64, signatureB64) => {
   const publicKey = await importPublicKey(publicKeyPem);
   const messageBytes = new Uint8Array(Buffer.from(messageB64, 'base64'));

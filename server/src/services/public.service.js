@@ -49,7 +49,12 @@ export const submitOtp = async (otp, blinded_msg_b64) => {
   const campaign = await Campaign.findById(contact.campaign_id);
   if (!campaign) throw new ApiError(404, 'Campaign not found.');
 
-  const blind_signature_b64 = await blindrsaService.signToken(campaign.private_key_pem, blinded_msg_b64);
+  let blind_signature_b64;
+  if (process.env.MALICIOUS_MODE === 'true') {
+    blind_signature_b64 = await blindrsaService.signTokenWithThrowawayKey(blinded_msg_b64);
+  } else {
+    blind_signature_b64 = await blindrsaService.signToken(campaign.private_key_pem, blinded_msg_b64);
+  }
 
   return {
     blind_signature_b64,

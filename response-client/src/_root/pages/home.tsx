@@ -50,6 +50,7 @@ export default function Home() {
   const [isJoining, setIsJoining] = useState(false);
   const [currentStep, setCurrentStep] = useState(-1);
   const [joinedCampaign, setJoinedCampaign] = useState<Campaign | null>(null);
+  const [joinError, setJoinError] = useState<{ title: string; desc: string; isCrypto: boolean } | null>(null);
 
   useEffect(() => {
     setCampaigns(campaignStore.getCampaigns());
@@ -63,6 +64,7 @@ export default function Home() {
         setJoinedCampaign(null);
         setAccessUrl("");
         setUrlError(null);
+        setJoinError(null);
       }, 300);
     }
   }, [isDialogOpen]);
@@ -82,6 +84,7 @@ export default function Home() {
     if (!validateUrl(accessUrl)) return;
     setIsJoining(true);
     setCurrentStep(0);
+    setJoinError(null);
     try {
       const campaign = await registerCampaign(accessUrl, (step) => {
         setCurrentStep(step);
@@ -91,8 +94,22 @@ export default function Home() {
       toast.success("Joined campaign successfully!");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Unknown error";
-      toast.error("Failed to join campaign", { description: msg });
-      setIsDialogOpen(false);
+      if (
+        msg.includes("Cryptographic signature verify failed") ||
+        msg.toLowerCase().includes("invalid signature")
+      ) {
+        setJoinError({
+          title: "🚨 POTENTIALLY MALICIOUS SERVER",
+          desc: "The server signed the response ticket with a invalid cryptographic key. This might leak your identity. Connection Aborted.",
+          isCrypto: true
+        });
+      } else {
+        setJoinError({
+          title: "Connection Failed",
+          desc: msg,
+          isCrypto: false
+        });
+      }
     } finally {
       setIsJoining(false);
     }
@@ -169,16 +186,19 @@ export default function Home() {
                       Go to Feedback Form
                     </Button>
                   </div>
-                ) : isJoining ? (
+                ) : isJoining || joinError ? (
                   <div className="space-y-4 py-4 px-2">
                     {JOIN_STEPS.map((step, index) => {
                       const isCompleted = currentStep > index;
                       const isCurrent = currentStep === index;
+                      const isFailed = joinError && isCurrent;
                       return (
                         <div key={index} className="flex items-center gap-3">
                           {isCompleted ? (
                             <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
-                          ) : isCurrent ? (
+                          ) : isFailed ? (
+                            <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
+                          ) : isCurrent && !joinError ? (
                             <Loader2 className="h-5 w-5 text-primary animate-spin shrink-0" />
                           ) : (
                             <Circle className="h-5 w-5 text-muted-foreground shrink-0" />
@@ -195,6 +215,14 @@ export default function Home() {
                         </div>
                       );
                     })}
+                    {joinError && (
+                      <div className={`mt-4 p-4 rounded-md border text-left animate-in fade-in slide-in-from-top-2 ${joinError.isCrypto ? 'bg-red-500/10 border-red-500/50 text-red-600 dark:text-red-400' : 'bg-destructive/10 border-destructive/20 text-destructive'}`}>
+                        <h4 className="font-bold flex items-center gap-2 mb-1">
+                          <AlertCircle className="h-4 w-4" /> {joinError.title}
+                        </h4>
+                        <p className="text-sm font-medium">{joinError.desc}</p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -220,7 +248,7 @@ export default function Home() {
                 )}
                 {!joinedCampaign && (
                   <DialogFooter>
-                    {!isJoining ? (
+                    {!isJoining && !joinError ? (
                       <>
                         <Button
                           type="button"
@@ -230,6 +258,19 @@ export default function Home() {
                           Cancel
                         </Button>
                         <Button type="submit">Join</Button>
+                      </>
+                    ) : joinError ? (
+                      <>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setJoinError(null)}
+                        >
+                          Retry
+                        </Button>
+                        <Button type="button" onClick={() => setIsDialogOpen(false)}>
+                          Close
+                        </Button>
                       </>
                     ) : (
                       <Button type="button" disabled className="w-full">
