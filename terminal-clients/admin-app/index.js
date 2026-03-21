@@ -40,11 +40,12 @@ async function loop() {
   console.log('0. Signup (Create new Admin Account)');
   console.log('1. Login (Existing Admin Account)');
   console.log('2. Create Campaign');
-  console.log('3. Add Text Question');
-  console.log('4. Add Contact Number');
-  console.log('5. Activate Campaign');
-  console.log('6. View Responses & Insights');
-  console.log('7. Exit');
+  console.log('3. Add Custom Text Question');
+  console.log('4. Add Mixed Demo Questions (All Types)');
+  console.log('5. Add Contact Number');
+  console.log('6. Activate Campaign');
+  console.log('7. View Responses & Insights');
+  console.log('8. Exit');
   
   const choice = await question('\nSelect option: ');
   
@@ -112,6 +113,23 @@ async function loop() {
     }
     else if (choice === '4') {
       if (!currentCampaignId) return console.log('❌ Create a campaign first!');
+      console.log('Adding demo set: single_choice, multi_choice, rating, and text...');
+      const res = await fetchApi(`/campaigns/${currentCampaignId}/questions`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          questions: [
+            { order: 0, type: 'single_choice', text: 'How did you primarily hear about us?', options: ['Social Media', 'Colleague', 'Search Engine', 'Other'] },
+            { order: 1, type: 'multi_choice', text: 'Which features do you use regularly?', options: ['Analytics Dashboard', 'Export Tools', 'API Integration', 'Mobile App'] },
+            { order: 2, type: 'rating', text: 'How would you rate your overall experience (1-10)?', options: [] },
+            { order: 3, type: 'text', text: 'Any additional feedback to share?', options: [] }
+          ]
+        })
+      });
+      if (res.ok) console.log('✅ Mixed Demo Questions added successfully!');
+      else console.error('❌ Failed:', res.data);
+    }
+    else if (choice === '5') {
+      if (!currentCampaignId) return console.log('❌ Create a campaign first!');
       const phone = await question('Enter phone number (e.g. 5551234): ');
       const res = await fetchApi(`/campaigns/${currentCampaignId}/contacts`, {
         method: 'POST',
@@ -120,7 +138,7 @@ async function loop() {
       if (res.ok) console.log(`✅ Added ${res.data.data.added} contact(s)!`);
       else console.error('❌ Failed:', res.data);
     }
-    else if (choice === '5') {
+    else if (choice === '6') {
       if (!currentCampaignId) return console.log('❌ Create a campaign first!');
       const res = await fetchApi(`/campaigns/${currentCampaignId}/activate`, {
         method: 'POST'
@@ -130,7 +148,7 @@ async function loop() {
         console.log('✅ Campaign activated! RSA Keypair generated and OTPs provisioned.');
       } else console.error('❌ Failed:', res.data);
     }
-    else if (choice === '6') {
+    else if (choice === '7') {
       if (!currentCampaignId) return console.log('❌ Select a campaign first!');
       const res = await fetchApi(`/campaigns/${currentCampaignId}/insights`, { method: 'GET' });
       if (res.ok) {
@@ -143,8 +161,8 @@ async function loop() {
           console.log(`Total Answers: ${q.total_answers}`);
           if (q.type === 'text' && q.texts) {
             q.texts.forEach(text => console.log(` - "${text}"`));
-          } else if (q.type === 'single_choice' && q.counts) {
-            Object.entries(q.counts).forEach(([opt, cnt]) => console.log(` - ${opt}: ${cnt}`));
+          } else if ((q.type === 'single_choice' || q.type === 'multi_choice') && q.counts) {
+            Object.entries(q.counts).forEach(([opt, cnt]) => console.log(` - ${opt}: ${cnt} vote(s)`));
           } else if (q.type === 'rating') {
             console.log(` - Average Rating: ${q.average}`);
           }
@@ -153,7 +171,7 @@ async function loop() {
       }
       else console.error('❌ Failed:', res.data);
     }
-    else if (choice === '7') {
+    else if (choice === '8') {
       rl.close();
       return;
     }
