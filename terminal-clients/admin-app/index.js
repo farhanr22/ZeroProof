@@ -95,7 +95,7 @@ async function loop() {
         method: 'PATCH',
         body: JSON.stringify({
           questions: [
-            { order: 0, type: 'text', text: 'Any feedback for the hackathon?' }
+            { order: 0, type: 'text', text: 'Any feedback for the hackathon?', options: [] }
           ]
         })
       });

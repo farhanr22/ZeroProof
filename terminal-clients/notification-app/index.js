@@ -1,7 +1,7 @@
 import readline from 'readline';
 
 const API_BASE = 'http://localhost:3000/api';
-const SECRET = 'dev_otp_secret'; // Hardcoded for demo
+const SECRET = 'development_otp_secret'; // Hardcoded for demo
 const SENDER_ID = `demo-worker-${Math.floor(Math.random() * 1000)}`;
 
 const rl = readline.createInterface({
