@@ -46,4 +46,18 @@ router.delete('/:id', asyncHandler(async (req, res) => {
   sendResponse(res, { success: true });
 }));
 
+import * as insightsService from '../../services/insights.service.js';
+
+// ... other endpoints earlier ...
+
+router.get('/:id/responses', asyncHandler(async (req, res) => {
+  const responses = await insightsService.listResponses(req.user.user_id, req.params.id);
+  sendResponse(res, { responses });
+}));
+
+router.get('/:id/insights', asyncHandler(async (req, res) => {
+  const insights = await insightsService.getInsights(req.user.user_id, req.params.id);
+  sendResponse(res, { insights });
+}));
+
 export default router;
