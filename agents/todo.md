@@ -10,3 +10,9 @@
   - [x] `otp-sender` pseudocode updated with full message template
   - [x] `CLIENT_APP_DOMAIN` added to `.env.example`
   - [x] All 53 tests pass across 9 suites
+
+## Tooling & Infrastructure
+- [x] Set up **Mongo-Express** admin interface (Docker-based)
+  - [x] Created `tools/mongo-express/docker-compose.yml`
+  - [x] Created `tools/mongo-express/start.sh` quick-start script
+  - [x] Verified connection and authentication

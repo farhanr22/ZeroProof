@@ -4,11 +4,11 @@
 Phase 10 Complete — Backend is DONE
 
 ## Recent Progress
-- `GET /api/public/start?otp=...` now returns plain text telling the user to open the link in the app (browser guard — no Header check needed, query param presence is the signal).
+- `GET /api/public/start?otp=...` now returns plain text browser guard explanation.
 - `POST /api/public/start` with `{ otp }` in body is the real client app endpoint.
-- The `access_url` sent by the notification service still embeds the otp as a query param — the client app reads it and sends it in the POST body.
-- All 53 tests across 9 suites passing.
+- **Tooling Setup**: Configured **Mongo-Express** admin interface at `tools/mongo-express/`. Accessible at [http://localhost:8081](http://localhost:8081) with credentials `admin` / `password`. Verified via curl (200 OK).
+- All 53 tests pass across 9 suites.
 
 ## Next Steps
-- Awaiting direction. Backend is feature-complete and committed.
-- Possible next areas: frontend client app, deployment config, real SMS provider integration.
+- Awaiting direction. Backend and infra tools (Mongo-Express) are feature-complete.
+- Possible next areas: frontend client app development, real OTP provider integration.

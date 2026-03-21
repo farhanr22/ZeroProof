@@ -1,0 +1,12 @@
+services:
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    network_mode: "host"
+    environment:
+      ME_CONFIG_MONGODB_URL: "mongodb://127.0.0.1:27017/zerotrust"
+      ME_CONFIG_BASICAUTH_USERNAME: "admin"
+      ME_CONFIG_BASICAUTH_PASSWORD: "password"
+    ports:
+      - "8081:8081"
