@@ -4,9 +4,14 @@
 Phase 10 Complete — Backend is DONE
 
 ## Recent Progress
-- `GET /api/public/start?otp=...` now returns plain text browser guard explanation.
-- **Tooling Setup**: Configured **Mongo-Express** admin interface at `tools/mongo-express/`. Accessible at [http://localhost:8081](http://localhost:8081).
-- **Demo Mode**: Built 3 independent Node.js CLI apps in `terminal-clients/` (Admin, Notification Worker, Client) specifically designed for hackathon judging. The Client App includes interactive pauses to manually verify side-by-side SPKI public key hashes and unique anonymized Token Hashes before finalizing the response.
+- **Phase 12 Complete:** Built real WhatsApp OTP Sender at `otp-sender/`.
+  - Uses `whatsapp-web.js` with `LocalAuth` for persistent sessions (QR code on first boot).
+  - E.164 number validation — rejects bad numbers and calls `release-lock`.
+  - Infinitely polls `next-contact`, formats and sends the WhatsApp message, then calls `confirm-sent`.
+  - Config loaded from `.env` (`API_BASE`, `OTP_SERVICE_SECRET`). `.env.example` provided.
+  - `.wwebjs_auth/` and `.wwebjs_cache/` directories added to `.gitignore`.
+- **Duplicate Campaign Names:** Backend now prevents creating two campaigns with the same name per admin (checked in service + unique DB index). 1 new test added. All 54 tests pass.
+- **OTP 3-Strike Limit:** `Contact` model now tracks `failures`. Contacts that fail delivery 3+ times are silently excluded from the polling queue.
 
 ## Next Steps
-- Awaiting direction. Core backend functionality and local demo infrastructure are feature-complete.
+- Awaiting direction. Full stack (backend + terminal clients + WhatsApp sender) is feature-complete.

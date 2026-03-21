@@ -22,3 +22,11 @@
 - [x] Notification App CLI (poll, print SMS, confirm)
 - [x] Client App CLI (verify SPKI hash, answer single question, verify Token Hash, submit)
 - [x] Write `DEMO_RUNBOOK.md` instructions
+
+## Phase 12: Real WhatsApp OTP Sender (Completed)
+- [x] Initialize `otp-sender` package with `whatsapp-web.js`, `qrcode-terminal`, `dotenv`
+- [x] `LocalAuth` session persists across restarts; QR code printed on first boot
+- [x] E.164 number validation (10-15 digits); invalid numbers call `release-lock`
+- [x] Infinite poller: `next-contact` → validate → send via WA → `confirm-sent` / `release-lock`
+- [x] Config from `.env` (`API_BASE`, `OTP_SERVICE_SECRET`); `.env.example` added
+- [x] `.wwebjs_auth/` and `.wwebjs_cache/` added to `.gitignore`
