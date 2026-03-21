@@ -101,7 +101,7 @@ export default function Response() {
 
             return (
               <Card key={q._id} className="shadow-sm border-primary/10 overflow-hidden">
-                <CardHeader className="bg-muted/30 pb-4 border-b">
+                <CardHeader className="bg-muted/30 pb-3 border-b">
                   <CardTitle className="text-base font-semibold leading-relaxed">
                     {idx + 1}. {q.text}
                   </CardTitle>
@@ -109,7 +109,7 @@ export default function Response() {
                     {q.type.replace("_", " ")}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="pt-5 bg-card">
+                <CardContent className="pt-0 bg-card">
                   <div className="text-foreground text-base">{display}</div>
                 </CardContent>
               </Card>

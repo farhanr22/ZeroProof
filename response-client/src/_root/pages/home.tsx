@@ -155,14 +155,14 @@ export default function Home() {
                 <DialogDescription>
                   Paste the full access URL you received (e.g.{" "}
                   <code className="text-xs bg-muted px-1 rounded">
-                    http://server/api/public/start?otp=123456
+                    https://example.com/start?otp=123456
                   </code>
                   ).
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleJoinCampaign} className="space-y-4 py-4">
+              <form onSubmit={handleJoinCampaign} className="space-y-4 pt-4 pb-0">
                 {joinedCampaign ? (
-                  <div className="flex flex-col items-center justify-center py-6 space-y-4 fade-in animate-in">
+                  <div className="flex flex-col items-center justify-center pt-6 pb-0 space-y-4 fade-in animate-in">
                     <div
                       className="bg-muted/30 p-4 rounded-xl shadow-sm border w-37.5 h-37.5 flex items-center justify-center"
                       dangerouslySetInnerHTML={{
@@ -172,9 +172,16 @@ export default function Home() {
                     <h3 className="text-xl font-semibold mt-2">
                       {joinedCampaign.name}
                     </h3>
-                    <p className="text-center text-muted-foreground text-sm">
-                      Compare your Security Pattern with peers before submitting.
-                    </p>
+                    <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-lg p-4 w-full text-left mt-2">
+                      <h4 className="font-bold text-yellow-700 dark:text-yellow-500 flex items-center gap-2 mb-2">
+                        <span>ℹ️</span> Protect Your Privacy
+                      </h4>
+                      <ul className="text-sm text-yellow-800 dark:text-yellow-400 space-y-2 list-disc pl-5">
+                        <li>Compare the security pattern image with your peers to ensure they all match.</li>
+                        <li>Submit your response after a few hours or at a coordinated time with your group to prevent your identity from being leaked via timing correlation.</li>
+                        <li>Switch networks before submitting your response (such as switching from 4G to Wi-Fi) or use a VPN.</li>
+                      </ul>
+                    </div>
                     <Button
                       type="button"
                       className="w-full mt-4"
@@ -247,7 +254,7 @@ export default function Home() {
                   </div>
                 )}
                 {!joinedCampaign && (
-                  <DialogFooter>
+                  <DialogFooter className="pt-4 border-t mt-0">
                     {!isJoining && !joinError ? (
                       <>
                         <Button
@@ -337,7 +344,7 @@ export default function Home() {
                     )}
                   </div>
                 </CardContent>
-                <CardFooter className="pt-0 pb-6 mt-auto">
+                <CardFooter className="pt-4 pb-4 mt-auto">
                   {campaign.status === "pending" ? (
                     <Button
                       className="w-full shadow-sm"

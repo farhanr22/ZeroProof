@@ -89,6 +89,7 @@ export default function Feedback() {
   const navigate = useNavigate();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasAcknowledged, setHasAcknowledged] = useState(false);
 
   const schema = campaign ? buildFormSchema(campaign.questions) : z.object({});
   type FormValues = Record<string, unknown>;
@@ -333,13 +334,33 @@ export default function Feedback() {
             </FieldGroup>
           </form>
         </CardContent>
-        <CardFooter className="bg-muted/10 border-t pt-6">
+        <CardFooter className="bg-muted/10 border-t pt-6 flex flex-col gap-6">
+          <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-lg p-4 w-full text-left">
+            <h4 className="font-bold text-yellow-700 dark:text-yellow-500 flex items-center gap-2 mb-2">
+              <span>ℹ️</span> Protect Your Privacy
+            </h4>
+            <ul className="text-sm text-yellow-800 dark:text-yellow-400 space-y-2 list-disc pl-5">
+              <li>Compare the security pattern image with your peers to ensure they all match.</li>
+              <li>Submit your response after a few hours or at a coordinated time with your group to prevent your identity from being leaked via timing correlation.</li>
+              <li>Switch networks before submitting your response (such as switching from 4G to Wi-Fi) or use a VPN.</li>
+            </ul>
+          </div>
+          <div className="flex items-center space-x-3 self-start w-full px-1">
+            <Checkbox
+              id="acknowledge-privacy"
+              checked={hasAcknowledged}
+              onCheckedChange={(checked) => setHasAcknowledged(!!checked)}
+            />
+            <Label htmlFor="acknowledge-privacy" className="font-normal cursor-pointer text-sm leading-tight text-muted-foreground hover:text-foreground transition-colors">
+              I understand the above instructions concerning my privacy.
+            </Label>
+          </div>
           <Button
             type="submit"
             form="feedback-form"
             size="lg"
             className="w-full sm:w-auto ml-auto group"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !hasAcknowledged}
           >
             {isSubmitting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
