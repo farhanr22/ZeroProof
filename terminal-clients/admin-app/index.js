@@ -1,6 +1,6 @@
 import readline from 'readline';
 
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = 'http://localhost:3000/api';
 let adminToken = null;
 let currentCampaignId = null;
 
@@ -31,7 +31,8 @@ async function fetchApi(path, options = {}) {
 async function loop() {
   console.log('\n--- ZERO-TRUST ADMIN TERMINAL ---');
   console.log(`Status: ${adminToken ? 'Logged In' : 'Not Logged In'} | Campaign: ${currentCampaignId || 'None'}`);
-  console.log('1. Login (giga@admin.com)');
+  console.log('0. Signup (Create new Admin Account)');
+  console.log('1. Login (Existing Admin Account)');
   console.log('2. Create Campaign');
   console.log('3. Add Default Question (Text: "Any feedback for the hackathon?")');
   console.log('4. Add test Contact (simulated)');
@@ -43,23 +44,32 @@ async function loop() {
   const choice = await question('\nSelect option: ');
   
   try {
-    if (choice === '1') {
-      const email = 'giga@admin.com';
-      const password = 'new_giga_password'; // Using the one from E2E test, or fall back to password123
+    if (choice === '0') {
+      const email = await question('Enter email to register: ');
+      const password = await question('Enter new password: ');
+      console.log(`\nSigning up as ${email}...`);
+      
+      const res = await fetchApi('/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify({ email, password })
+      });
+
+      if (res.ok) {
+        adminToken = res.data.data.token;
+        console.log('✅ Signup successful and logged in!');
+      } else {
+        console.error('❌ Signup failed:', res.data);
+      }
+    }
+    else if (choice === '1') {
+      const email = await question('Enter email: ');
+      const password = await question('Enter password: ');
       console.log(`\nLogging in as ${email}...`);
       
-      // Try E2E password first, then fallback to password123 maybe? Let's just prompt or hardcode password123
-      let res = await fetchApi('/auth/login', {
+      const res = await fetchApi('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email: 'giga@admin.com', password: 'new_giga_password' })
+        body: JSON.stringify({ email, password })
       });
-      if (!res.ok) {
-         console.log("Trying 'password123' instead...");
-         res = await fetchApi('/auth/login', {
-          method: 'POST',
-          body: JSON.stringify({ email: 'giga@admin.com', password: 'password123' })
-        });
-      }
 
       if (res.ok) {
         adminToken = res.data.data.token;

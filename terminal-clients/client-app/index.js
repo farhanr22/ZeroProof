@@ -2,7 +2,7 @@ import readline from 'readline';
 import crypto from 'crypto';
 import { RSABSSA } from '@cloudflare/blindrsa-ts';
 
-const API_BASE = 'http://localhost:4000/api';
+const API_BASE = 'http://localhost:3000/api';
 const suite = RSABSSA.SHA384.PSS.Randomized();
 
 const rl = readline.createInterface({
