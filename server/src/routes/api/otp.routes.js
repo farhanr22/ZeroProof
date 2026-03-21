@@ -5,22 +5,18 @@ import * as otpService from '../../services/otp.service.js';
 
 const router = Router();
 
+// Returns { campaign_name, value, access_url, contact_id, campaign_id }
+// access_url contains the OTP embedded — notification service puts this directly in the message.
+// Raw OTP is NOT exposed here.
 router.get('/next-contact', asyncHandler(async (req, res) => {
   const sender_id = req.query.sender_id || 'default_worker';
-  const contact = await otpService.lockNextContact(sender_id);
-  
-  if (!contact) {
-    // 204 No Content explicitly signals the worker queue is fully empty
+  const result = await otpService.lockNextContact(sender_id);
+
+  if (!result) {
     return res.status(204).end();
   }
 
-  // Strip MongoDB specifics and relay pure string outputs to the worker
-  sendResponse(res, {
-    contact_id: contact._id,
-    campaign_id: contact.campaign_id,
-    value: contact.value,
-    otp: contact.otp
-  });
+  sendResponse(res, result);
 }));
 
 router.post('/confirm-sent', asyncHandler(async (req, res) => {

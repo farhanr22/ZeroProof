@@ -55,17 +55,24 @@ describe('Public API Crypto Endpoints (/api/public/*)', () => {
     let blindSignatureB64;
     let finalSignatureB64;
 
-    it('Step 1: /start strictly extracts binary SPKI environments securely via natively stringified derivations', async () => {
+    it('GET /start with otp query param returns plain text (browser guard)', async () => {
       const res = await request(app).get(`/api/public/start?otp=${otp}`);
+      expect(res.status).toBe(200);
+      expect(res.type).toMatch(/text/);
+      expect(res.text).toMatch(/app/i);
+    });
+
+    it('Step 1: POST /start returns campaign_name, public_key_spki, and question_payload (no campaign_id)', async () => {
+      const res = await request(app).post('/api/public/start').send({ otp });
       expect(res.status).toBe(200);
       expect(res.body.data.public_key_spki).toBeDefined();
       expect(res.body.data.question_payload).toBeDefined();
-      expect(res.body.data.campaign_id).toBe(campaignId.toString());
+      expect(res.body.data.campaign_name).toBeDefined();
+      expect(res.body.data.campaign_id).toBeUndefined();
 
       pubKeySpkiB64 = res.body.data.public_key_spki;
       questionPayloadString = res.body.data.question_payload;
 
-      // Extract client-side WebCrypto definitions mimicking robust front-ends accurately
       const publicKeyBytes = Buffer.from(pubKeySpkiB64, 'base64');
       cryptoKeyObj = await crypto.webcrypto.subtle.importKey(
         'spki',
@@ -77,28 +84,27 @@ describe('Public API Crypto Endpoints (/api/public/*)', () => {
       expect(cryptoKeyObj).toBeDefined();
     });
 
-    it('Step 2: /submit-otp completely obfuscates client values inherently matching legacy scripts dynamically', async () => {
-      // Blinding mathematics explicitly abstracted correctly
+    it('Step 2: /submit-otp marks OTP as used and returns blind signature + derived campaign_id', async () => {
       const token = crypto.randomBytes(32);
       preparedMsg = suite.prepare(token);
       const blindResult = await suite.blind(cryptoKeyObj, preparedMsg);
       blindedMsgBuffer = blindResult.blindedMsg;
       invObj = blindResult.inv;
 
-      // Executing request payloads
+      // No campaign_id sent by client — derived server-side from OTP
       const res = await request(app)
         .post('/api/public/submit-otp')
         .send({
           otp,
-          blinded_msg_b64: Buffer.from(blindedMsgBuffer).toString('base64'),
-          campaign_id: campaignId.toString()
+          blinded_msg_b64: Buffer.from(blindedMsgBuffer).toString('base64')
         });
 
       expect(res.status).toBe(200);
       expect(res.body.data.blind_signature_b64).toBeDefined();
+      expect(res.body.data.campaign_id).toBeDefined(); // returned for use in submit-response
       blindSignatureB64 = res.body.data.blind_signature_b64;
+      campaignId = res.body.data.campaign_id; // update to string form
 
-      // Check strictly mathematical guarantees block double usage statically inside MongoDB inherently
       const verifiedContact = await Contact.findOne({ otp });
       expect(verifiedContact.otp_used).toBe(true);
     });

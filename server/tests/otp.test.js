@@ -47,8 +47,12 @@ describe('OTP Notification Service API', () => {
     
     expect(res.status).toBe(200);
     expect(res.body.data.contact_id).toBeDefined();
+    expect(res.body.data.campaign_name).toBeDefined();
+    expect(res.body.data.value).toBeDefined();
+    expect(res.body.data.access_url).toMatch(/\/start\?otp=/);
+    // Raw OTP must NOT be exposed
+    expect(res.body.data.otp).toBeUndefined();
     
-    // Validate immutable tracking values inside Mongoose natively
     const contact = await Contact.findById(res.body.data.contact_id);
     expect(contact.send_lock.locked_by).toBe('workerA');
     expect(contact.send_lock.locked_at).toBeDefined();

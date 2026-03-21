@@ -124,14 +124,22 @@ describe('GIGA Master E2E Flow', () => {
         .get(`/api/otp/next-contact?sender_id=E2E-worker`)
         .set('X-OTP-Service-Secret', otpServiceSecret);
       expect(poll.status).toBe(200);
-      extractedOtps.push({ value: poll.body.data.value, otp: poll.body.data.otp });
+      expect(poll.body.data.access_url).toMatch(/\/start\?otp=/);
+      expect(poll.body.data.campaign_name).toBeDefined();
+      expect(poll.body.data.otp).toBeUndefined(); // raw OTP must not be exposed
+      extractedOtps.push({
+        value:       poll.body.data.value,
+        access_url:  poll.body.data.access_url,
+        contact_id:  poll.body.data.contact_id,
+        campaign_id: poll.body.data.campaign_id
+      });
 
       await request(app)
         .post('/api/otp/confirm-sent')
         .set('X-OTP-Service-Secret', otpServiceSecret)
         .send({
           contact_id:  poll.body.data.contact_id,
-          campaign_id: campaignId,
+          campaign_id: poll.body.data.campaign_id,
           sender_id:   'E2E-worker'
         })
         .expect(200);
@@ -146,10 +154,15 @@ describe('GIGA Master E2E Flow', () => {
 
   // ── 5. CLIENT CRYPTO (per OTP) ───────────────────────────────────────────
 
-  const simulateClient = async (otp, choiceOption, ratingValue) => {
-    // a. /start
-    const startRes = await request(app).get(`/api/public/start?otp=${otp}`);
+  const simulateClient = async (contactEntry, choiceOption, ratingValue) => {
+    // Extract otp from the access_url
+    const otp = new URL(contactEntry.access_url).searchParams.get('otp');
+
+    // a. POST /start — client app extracts OTP from access_url and sends it in the body
+    const startRes = await request(app).post('/api/public/start').send({ otp });
     expect(startRes.status).toBe(200);
+    expect(startRes.body.data.campaign_name).toBeDefined();
+    expect(startRes.body.data.campaign_id).toBeUndefined();
     const pubKeySpkiB64 = startRes.body.data.public_key_spki;
 
     const cryptoKey = await crypto.webcrypto.subtle.importKey(
@@ -165,27 +178,27 @@ describe('GIGA Master E2E Flow', () => {
     const preparedMsg = suite.prepare(token);
     const { blindedMsg, inv } = await suite.blind(cryptoKey, preparedMsg);
 
-    // c. /submit-otp
+    // c. /submit-otp — no campaign_id sent by client
     const otpRes = await request(app)
       .post('/api/public/submit-otp')
       .send({
         otp,
-        blinded_msg_b64: Buffer.from(blindedMsg).toString('base64'),
-        campaign_id:     campaignId
+        blinded_msg_b64: Buffer.from(blindedMsg).toString('base64')
       });
     expect(otpRes.status).toBe(200);
+    const { blind_signature_b64, campaign_id: derivedCampaignId } = otpRes.body.data;
 
     // d. Unblind locally
-    const blindSigBytes  = new Uint8Array(Buffer.from(otpRes.body.data.blind_signature_b64, 'base64'));
+    const blindSigBytes  = new Uint8Array(Buffer.from(blind_signature_b64, 'base64'));
     const finalSigBytes  = await suite.finalize(cryptoKey, preparedMsg, blindSigBytes, inv);
     const localValid     = await suite.verify(cryptoKey, finalSigBytes, preparedMsg);
     expect(localValid).toBe(true);
 
-    // e. /submit-response
+    // e. /submit-response — campaign_id comes from submitOtp response (in-memory)
     const subRes = await request(app)
       .post('/api/public/submit-response')
       .send({
-        campaign_id:   campaignId,
+        campaign_id:   derivedCampaignId,
         token_b64:     Buffer.from(preparedMsg).toString('base64'),
         signature_b64: Buffer.from(finalSigBytes).toString('base64'),
         answers: [
@@ -197,16 +210,16 @@ describe('GIGA Master E2E Flow', () => {
   };
 
   it('5a. Client 1 submits anonymous response', async () => {
-    await simulateClient(extractedOtps[0].otp, 'RSA', 10);
+    await simulateClient(extractedOtps[0], 'RSA', 10);
   });
 
   it('5b. Client 2 submits anonymous response', async () => {
-    await simulateClient(extractedOtps[1].otp, 'ECC', 8);
+    await simulateClient(extractedOtps[1], 'ECC', 8);
   });
 
-  it('5c. Replay attack blocked with 409', async () => {
-    // Re-use Client 1's OTP — it's already been consumed, /start should fail
-    const res = await request(app).get(`/api/public/start?otp=${extractedOtps[0].otp}`);
+  it('5c. Replay attack: consumed OTP rejected by POST /start with 404', async () => {
+    const otp = new URL(extractedOtps[0].access_url).searchParams.get('otp');
+    const res = await request(app).post('/api/public/start').send({ otp });
     expect(res.status).toBe(404);
   });
 
