@@ -5,9 +5,14 @@ import { sendResponse } from '../../core/response.js';
 import { authMiddleware } from '../../core/auth.middleware.js';
 import * as campaignService from '../../services/campaign.service.js';
 import { createCampaignSchema, updateCampaignInfoSchema } from '../../schemas/campaign.schema.js';
+import contactsRoutes from './contacts.routes.js';
+import questionsRoutes from './questions.routes.js';
 
 const router = Router();
 router.use(authMiddleware);
+
+router.use('/:id/contacts', contactsRoutes);
+router.use('/:id/questions', questionsRoutes);
 
 router.get('/', asyncHandler(async (req, res) => {
   req.log.info({ user_id: req.user.user_id }, 'Listing campaigns');
