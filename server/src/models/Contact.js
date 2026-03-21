@@ -10,6 +10,7 @@ const contactSchema = new mongoose.Schema({
     locked_by: { type: String, default: null },
     locked_at: { type: Date, default: null }
   },
+  failures: { type: Number, default: 0 },
   created_at: { type: Date, default: Date.now }
 });
 

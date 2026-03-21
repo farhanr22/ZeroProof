@@ -15,15 +15,26 @@ export const lockNextContact = async (sender_id) => {
 
   const staleThreshold = new Date(Date.now() - 60000);
 
+  // 1. Reclaim any stale locks and increment their failures
+  await Contact.updateMany(
+    {
+      'send_lock.locked_at': { $lt: staleThreshold },
+      sent_at: null
+    },
+    {
+      $set: { 'send_lock.locked_by': null, 'send_lock.locked_at': null },
+      $inc: { failures: 1 }
+    }
+  );
+
+  // 2. Claim next available contact that hasn't failed 3+ times
   const contact = await Contact.findOneAndUpdate(
     {
       otp: { $ne: null },
       otp_used: false,
       sent_at: null,
-      $or: [
-        { 'send_lock.locked_by': null },
-        { 'send_lock.locked_at': { $lt: staleThreshold } }
-      ]
+      'send_lock.locked_by': null,
+      $or: [{ failures: { $lt: 3 } }, { failures: { $exists: false } }]
     },
     {
       $set: {
@@ -65,7 +76,10 @@ export const releaseLock = async (contact_id, campaign_id, sender_id) => {
 
   const contact = await Contact.findOneAndUpdate(
     { _id: contact_id, campaign_id, 'send_lock.locked_by': sender_id },
-    { $set: { 'send_lock.locked_by': null, 'send_lock.locked_at': null } },
+    { 
+      $set: { 'send_lock.locked_by': null, 'send_lock.locked_at': null },
+      $inc: { failures: 1 }
+    },
     { returnDocument: 'after' }
   );
 
