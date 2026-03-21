@@ -2,7 +2,7 @@ import { Contact } from '../models/Contact.js';
 import { Campaign } from '../models/Campaign.js';
 import { ApiError } from '../core/errors.js';
 
-const CLIENT_APP_DOMAIN = process.env.CLIENT_APP_DOMAIN || 'http://localhost:4000';
+const CLIENT_APP_DOMAIN = process.env.CLIENT_APP_DOMAIN || 'http://localhost:3000';
 
 /**
  * Claims a lease on the next available unsent contact.

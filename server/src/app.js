@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import pinoHttp from 'pino-http';
 import { logger } from './core/logger.js';
 import { ApiError } from './core/errors.js';
@@ -9,6 +10,14 @@ const app = express();
 
 app.use(express.json());
 app.use(pinoHttp({ logger }));
+
+// Public client routes: open to any origin — the response-client app is open source
+// and can be served from any domain. No auth is required here anyway.
+app.use('/api/public', cors({ origin: '*', methods: ['GET', 'POST', 'OPTIONS'] }));
+
+// Admin + OTP routes: restrict to the configured origin in production
+const adminCorsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+app.use('/api', cors({ origin: adminCorsOrigin, credentials: true, methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'] }));
 
 app.use('/api', apiRoutes);
 
