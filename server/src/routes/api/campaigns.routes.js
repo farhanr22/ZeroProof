@@ -31,6 +31,11 @@ router.get('/:id', asyncHandler(async (req, res) => {
   sendResponse(res, { campaign });
 }));
 
+router.post('/:id/activate', asyncHandler(async (req, res) => {
+  const campaign = await campaignService.activateCampaign(req.user.user_id, req.params.id);
+  sendResponse(res, { campaign });
+}));
+
 router.patch('/:id/info', validate(updateCampaignInfoSchema), asyncHandler(async (req, res) => {
   const campaign = await campaignService.updateCampaignInfo(req.user.user_id, req.params.id, req.body);
   sendResponse(res, { campaign });
