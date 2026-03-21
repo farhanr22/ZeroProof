@@ -189,38 +189,43 @@ export default function Feedback() {
         </div>
       </div>
 
-      <Card className="border-primary/10 shadow-md">
-        <CardHeader className="bg-muted/30 border-b">
-          <CardTitle className="text-xl">Feedback Form</CardTitle>
-          <CardDescription>
-            {campaign.questions.length} question{campaign.questions.length !== 1 ? "s" : ""} · Your response is anonymous and cryptographically protected.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <form id="feedback-form" onSubmit={form.handleSubmit(onSubmit)}>
-            <FieldGroup>
-              {campaign.questions
-                .sort((a, b) => a.order - b.order)
-                .map((question, idx) => (
-                  <Controller
-                    key={question._id}
-                    name={question._id}
-                    control={form.control}
-                    render={({ field, fieldState }) => (
-                      <Field
-                        data-invalid={fieldState.invalid}
-                        className="mb-8 block border border-border/60 rounded-xl p-6 bg-card shadow-sm"
-                      >
-                        <FieldLabel className="text-base text-foreground font-semibold">
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold tracking-tight">Feedback Form</h2>
+        <p className="text-muted-foreground mt-1 text-sm">
+          {campaign.questions.length} question{campaign.questions.length !== 1 ? "s" : ""} · Your response is anonymous and cryptographically protected.
+        </p>
+      </div>
+
+      <form id="feedback-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FieldGroup className="space-y-6">
+          {campaign.questions
+            .sort((a, b) => a.order - b.order)
+            .map((question, idx) => (
+              <Controller
+                key={question._id}
+                name={question._id}
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Card className="shadow-sm border-primary/10 overflow-hidden">
+                    <CardHeader className="bg-muted/30 pb-4 border-b">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-base font-semibold leading-relaxed">
                           {idx + 1}. {question.text}
-                        </FieldLabel>
+                        </CardTitle>
+                      </div>
+                      <CardDescription className="text-xs uppercase tracking-wide">
+                        {question.type.replace("_", " ")}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0 bg-card">
+                      <Field data-invalid={fieldState.invalid} className="block">
 
                         {/* single_choice → Radio */}
                         {question.type === "single_choice" && (
                           <RadioGroup
                             onValueChange={field.onChange}
                             value={field.value as string}
-                            className="flex flex-col space-y-2 mt-4"
+                            className="flex flex-col space-y-2 mt-1"
                           >
                             {question.options.map((opt) => (
                               <div
@@ -241,7 +246,7 @@ export default function Feedback() {
 
                         {/* multi_choice → Checkboxes */}
                         {question.type === "multi_choice" && (
-                          <div className="flex flex-col space-y-2 mt-4">
+                          <div className="flex flex-col space-y-2 mt-1">
                             {question.options.map((opt) => {
                               const selected = (field.value as string[]) || [];
                               return (
@@ -274,7 +279,7 @@ export default function Feedback() {
 
                         {/* rating → Slider */}
                         {question.type === "rating" && (
-                          <div className="mt-4 mb-2 flex items-center gap-4 rounded-md bg-muted/20 p-4 border">
+                          <div className="mt-1 mb-2 flex items-center gap-4 rounded-md bg-muted/20 p-4 border">
                             <span className="text-sm font-medium text-muted-foreground bg-background px-2 py-1 rounded shadow-sm select-none">
                               1
                             </span>
@@ -304,7 +309,7 @@ export default function Feedback() {
 
                         {/* text → Textarea */}
                         {question.type === "text" && (
-                          <InputGroup className="mt-4">
+                          <InputGroup className="mt-1">
                             <InputGroupTextarea
                               {...field}
                               value={(field.value as string) || ""}
@@ -328,13 +333,14 @@ export default function Feedback() {
                           />
                         )}
                       </Field>
-                    )}
-                  />
-                ))}
-            </FieldGroup>
-          </form>
-        </CardContent>
-        <CardFooter className="bg-muted/10 border-t pt-6 flex flex-col gap-6">
+                    </CardContent>
+                  </Card>
+                )}
+              />
+            ))}
+        </FieldGroup>
+
+        <div className="mt-8 bg-muted/20 border rounded-xl flex flex-col gap-6 p-3 shadow-sm">
           <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-lg p-4 w-full text-left">
             <h4 className="font-bold text-yellow-700 dark:text-yellow-500 flex items-center gap-2 mb-2">
               <span>ℹ️</span> Protect Your Privacy
@@ -355,22 +361,23 @@ export default function Feedback() {
               I understand the above instructions concerning my privacy.
             </Label>
           </div>
-          <Button
-            type="submit"
-            form="feedback-form"
-            size="lg"
-            className="w-full sm:w-auto ml-auto group"
-            disabled={isSubmitting || !hasAcknowledged}
-          >
-            {isSubmitting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-            )}
-            Submit Anonymously
-          </Button>
-        </CardFooter>
-      </Card>
+          <div className="flex justify-end pt-4 border-t border-border/60">
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full sm:w-auto group mt-2"
+              disabled={isSubmitting || !hasAcknowledged}
+            >
+              {isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+              )}
+              Submit Anonymously
+            </Button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }
