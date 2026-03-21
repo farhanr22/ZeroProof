@@ -36,6 +36,17 @@ describe('Campaigns API /api/campaigns', () => {
       campaignId = res.body.data.campaign._id;
     });
 
+    it('prevents User A from creating another campaign with the same name', async () => {
+      const res = await request(app)
+        .post('/api/campaigns')
+        .set('Authorization', `Bearer ${userAToken}`)
+        .send({ name: 'Campaign A' });
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe(true);
+      expect(res.body.error_message).toBe('A campaign with this name already exists');
+    });
+
     it('User A lists their campaigns and sees Campaign A', async () => {
       const res = await request(app)
         .get('/api/campaigns')

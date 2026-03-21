@@ -21,5 +21,6 @@ const campaignSchema = new mongoose.Schema({
 
 campaignSchema.index({ admin_id: 1 });
 campaignSchema.index({ mode: 1, admin_id: 1 });
+campaignSchema.index({ admin_id: 1, name: 1 }, { unique: true });
 
 export const Campaign = mongoose.model('Campaign', campaignSchema);

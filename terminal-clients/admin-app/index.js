@@ -3,6 +3,8 @@ import readline from 'readline';
 const API_BASE = 'http://localhost:3000/api';
 let adminToken = null;
 let currentCampaignId = null;
+let currentCampaignName = null;
+let currentCampaignStatus = 'draft';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -30,12 +32,16 @@ async function fetchApi(path, options = {}) {
 
 async function loop() {
   console.log('\n--- ZERO-TRUST ADMIN TERMINAL ---');
-  console.log(`Status: ${adminToken ? 'Logged In' : 'Not Logged In'} | Campaign: ${currentCampaignId || 'None'}`);
+  let campStr = 'None';
+  if (currentCampaignName) {
+    campStr = `${currentCampaignName} [${currentCampaignStatus === 'active' ? 'Active' : 'Draft'} mode]`;
+  }
+  console.log(`Status: ${adminToken ? 'Logged In' : 'Not Logged In'} | Campaign: ${campStr}`);
   console.log('0. Signup (Create new Admin Account)');
   console.log('1. Login (Existing Admin Account)');
   console.log('2. Create Campaign');
   console.log('3. Add Text Question');
-  console.log('4. Add Test Contact');
+  console.log('4. Add Contact Number');
   console.log('5. Activate Campaign');
   console.log('6. View Responses & Insights');
   console.log('7. Exit');
@@ -85,7 +91,9 @@ async function loop() {
       });
       if (res.ok) {
         currentCampaignId = res.data.data.campaign._id;
-        console.log(`✅ Campaign created! ID: ${currentCampaignId}`);
+        currentCampaignName = res.data.data.campaign.name;
+        currentCampaignStatus = res.data.data.campaign.status || 'draft';
+        console.log(`✅ Campaign created! Name: ${currentCampaignName}`);
       } else console.error('❌ Failed:', res.data);
     }
     else if (choice === '3') {
@@ -118,6 +126,7 @@ async function loop() {
         method: 'POST'
       });
       if (res.ok) {
+        currentCampaignStatus = 'active';
         console.log('✅ Campaign activated! RSA Keypair generated and OTPs provisioned.');
       } else console.error('❌ Failed:', res.data);
     }

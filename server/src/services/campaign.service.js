@@ -11,7 +11,11 @@ export const listCampaigns = async (admin_id) => {
 };
 
 export const createCampaign = async (admin_id, name) => {
-  const campaign = new Campaign({ admin_id, name });
+  const existing = await Campaign.findOne({ admin_id, name: name.trim() });
+  if (existing) {
+    throw new ApiError(400, 'A campaign with this name already exists');
+  }
+  const campaign = new Campaign({ admin_id, name: name.trim() });
   await campaign.save();
   return campaign;
 };
@@ -28,7 +32,11 @@ export const updateCampaignInfo = async (admin_id, campaign_id, updates) => {
     throw new ApiError(400, 'Cannot edit an active campaign');
   }
   
-  if (updates.name !== undefined) campaign.name = updates.name;
+  if (updates.name !== undefined) {
+    const existing = await Campaign.findOne({ admin_id, name: updates.name.trim(), _id: { $ne: campaign._id } });
+    if (existing) throw new ApiError(400, 'A campaign with this name already exists');
+    campaign.name = updates.name.trim();
+  }
   if (updates.description !== undefined) campaign.description = updates.description;
   campaign.updated_at = new Date();
   

@@ -38,7 +38,7 @@ async function loop() {
     
     if (res.status === 204) {
       if (!global.listeningMsgPrinted) {
-        console.log('\n--- ZERO-TRUST NOTIFICATION WORKER ---');
+        console.log('\n--- NOTIFICATION WORKER ---');
         console.log('Listening for outgoing SMS...');
         global.listeningMsgPrinted = true;
       }
