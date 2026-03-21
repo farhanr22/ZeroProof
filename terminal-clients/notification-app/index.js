@@ -33,50 +33,35 @@ async function fetchApi(path, options = {}) {
 }
 
 async function loop() {
-  console.log('\n--- ZERO-TRUST NOTIFICATION WORKER ---');
-  console.log('Press ENTER to poll the queue for newly activated contacts...');
-  await question('');
-
   try {
     const res = await fetchApi(`/otp/next-contact?sender_id=${SENDER_ID}`, { method: 'GET' });
     
     if (res.status === 204) {
-      console.log('📭 Queue is empty. No SMS to send right now.');
+      if (!global.listeningMsgPrinted) {
+        console.log('\n--- ZERO-TRUST NOTIFICATION WORKER ---');
+        console.log('Listening for outgoing SMS...');
+        global.listeningMsgPrinted = true;
+      }
     } else if (res.ok) {
       const data = res.data.data;
-      console.log('\n========================================');
-      console.log(`📡 SENDING SMS TO: ${data.value}`);
-      console.log('========================================');
-      console.log(`Hi,\n`);
-      console.log(`You've been invited to share feedback for "${data.campaign_name}".\n`);
-      console.log(`Tap the link below or copy it into your feedback app:`);
-      console.log(`\x1b[36m${data.access_url}\x1b[0m\n`);
-      console.log(`This link can only be used once.`);
-      console.log('========================================\n');
+      console.log('\n----------------------------------------');
+      console.log(`To : ${data.value}`);
+      console.log(`URL: \x1b[36m${data.access_url}\x1b[0m`);
+      console.log('----------------------------------------');
       
-      const confirm = await question('Type "y" to confirm sent (or anything else to drop lease): ');
-      if (confirm.toLowerCase() === 'y') {
-        const confirmRes = await fetchApi('/otp/confirm-sent', {
-          method: 'POST',
-          body: JSON.stringify({
-            contact_id: data.contact_id,
-            campaign_id: data.campaign_id,
-            sender_id: SENDER_ID
-          })
-        });
-        if (confirmRes.ok) console.log('✅ Sent confirmed in DB!');
-        else console.error('❌ Failed to confirm:', confirmRes.data);
-      } else {
-        await fetchApi('/otp/release-lock', {
-          method: 'POST',
-          body: JSON.stringify({
-             contact_id: data.contact_id,
-             campaign_id: data.campaign_id,
-             sender_id: SENDER_ID
-          })
-        });
-        console.log('Lease released.');
-      }
+      // Auto-confirm
+      const confirmRes = await fetchApi('/otp/confirm-sent', {
+        method: 'POST',
+        body: JSON.stringify({
+          contact_id: data.contact_id,
+          campaign_id: data.campaign_id,
+          sender_id: SENDER_ID
+        })
+      });
+      if (!confirmRes.ok) console.error('❌ Failed to confirm:', confirmRes.data);
+      
+      // Pause slightly longer when a message is sent
+      await new Promise(r => setTimeout(r, 2000));
     } else {
       console.error('❌ Error from server:', res.data);
     }
@@ -84,7 +69,7 @@ async function loop() {
     console.error('Network Error:', e.message);
   }
 
-  setTimeout(loop, 1000);
+  setTimeout(loop, 2000);
 }
 
 loop();

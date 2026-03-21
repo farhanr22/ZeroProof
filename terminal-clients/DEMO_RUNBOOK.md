@@ -34,21 +34,24 @@ You will need **4 terminal splits/tabs** open to the `terminal-clients` director
 5. Press **`y`** to confirm sending.
 6. Press **ENTER** again to get the second contact's `access_url`. Copy `access_url` #2 and confirm.
 
-### Step 3: Clients Begin Local Cryptography
+### Step 3: Clients Begin Local Verification
 1. In **Client 1 Terminal**, run: `npm run client`
-2. Paste `access_url` #1. Wait until it pauses.
+2. Paste `access_url` #1. 
 3. In **Client 2 Terminal**, run: `npm run client`
-4. Paste `access_url` #2. Wait until it pauses.
+4. Paste `access_url` #2. 
 
 ### Step 4: The Cryptographic Proof (Judging Climax)
-At this point, both clients are paused and telling you to press ENTER.
+Both clients will now connect to the server and download the campaign payload.
+They will then pause and ask you to verify the hash.
 
 **Show the judges:**
-1. Look at the **SPKI Hash** on both terminals. Point out that they perfectly match. This proves both clients verified they are talking to the exact same Campaign Public Key.
-2. Look at the **TOKEN Hash** on both terminals. Point out that they are completely different. This proves that the identifying information used to submit the response is mathematically disconnected and highly anonymous.
+1. Look at the **Campaign Verification Hash** on both terminals. 
+2. Point out that they perfectly match. This proves both clients verified they are talking to the exact same Campaign Public Key, and receiving the exact same payload (meaning no targeted tracking questions are being fed to specific devices).
+3. Press **ENTER** on both Client windows to proceed to the question.
 
 ### Step 5: Submission & Verification
-1. Press **ENTER** on both Client windows to submit the payloads to the server.
-2. Return to the **Admin Terminal**.
-3. Select **[6] View Raw Responses**. The hashes stored here will match the Token hashes seen on the client devices. No phone numbers are attached!
-4. Select **[7] View Insights** to see the aggregated feedback data.
+1. Type your feedback into both terminals and press enter.
+2. The clients will generate the blinded tokens, get them signed, unblind them, and submit the final anonymous payload automatically.
+3. Return to the **Admin Terminal**.
+4. Select **[6] View Raw Responses**. 
+5. Select **[7] View Insights** to see the aggregated feedback data.

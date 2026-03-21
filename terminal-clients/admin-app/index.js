@@ -34,12 +34,11 @@ async function loop() {
   console.log('0. Signup (Create new Admin Account)');
   console.log('1. Login (Existing Admin Account)');
   console.log('2. Create Campaign');
-  console.log('3. Add Default Question (Text: "Any feedback for the hackathon?")');
-  console.log('4. Add test Contact (simulated)');
-  console.log('5. Activate Campaign (Generates Keys)');
-  console.log('6. View Raw Responses');
-  console.log('7. View Insights');
-  console.log('8. Exit');
+  console.log('3. Add Text Question');
+  console.log('4. Add Test Contact');
+  console.log('5. Activate Campaign');
+  console.log('6. View Responses & Insights');
+  console.log('7. Exit');
   
   const choice = await question('\nSelect option: ');
   
@@ -91,11 +90,12 @@ async function loop() {
     }
     else if (choice === '3') {
       if (!currentCampaignId) return console.log('❌ Create a campaign first!');
+      const qText = await question('Enter the question text: ');
       const res = await fetchApi(`/campaigns/${currentCampaignId}/questions`, {
         method: 'PATCH',
         body: JSON.stringify({
           questions: [
-            { order: 0, type: 'text', text: 'Any feedback for the hackathon?', options: [] }
+            { order: 0, type: 'text', text: qText, options: [] }
           ]
         })
       });
@@ -123,17 +123,28 @@ async function loop() {
     }
     else if (choice === '6') {
       if (!currentCampaignId) return console.log('❌ Select a campaign first!');
-      const res = await fetchApi(`/campaigns/${currentCampaignId}/responses`, { method: 'GET' });
-      if (res.ok) console.log(JSON.stringify(res.data.data.responses, null, 2));
+      const res = await fetchApi(`/campaigns/${currentCampaignId}/insights`, { method: 'GET' });
+      if (res.ok) {
+        console.log('\n--- CAMPAIGN INSIGHTS ---');
+        const insights = res.data.data.insights;
+        if (insights.length === 0) console.log('No questions found.');
+        
+        insights.forEach((q, idx) => {
+          console.log(`\nQ${idx + 1}: ${q.text}`);
+          console.log(`Total Answers: ${q.total_answers}`);
+          if (q.type === 'text' && q.texts) {
+            q.texts.forEach(text => console.log(` - "${text}"`));
+          } else if (q.type === 'single_choice' && q.counts) {
+            Object.entries(q.counts).forEach(([opt, cnt]) => console.log(` - ${opt}: ${cnt}`));
+          } else if (q.type === 'rating') {
+            console.log(` - Average Rating: ${q.average}`);
+          }
+        });
+        console.log('-------------------------\n');
+      }
       else console.error('❌ Failed:', res.data);
     }
     else if (choice === '7') {
-      if (!currentCampaignId) return console.log('❌ Select a campaign first!');
-      const res = await fetchApi(`/campaigns/${currentCampaignId}/insights`, { method: 'GET' });
-      if (res.ok) console.log(JSON.stringify(res.data.data.insights, null, 2));
-      else console.error('❌ Failed:', res.data);
-    }
-    else if (choice === '8') {
       rl.close();
       return;
     }
@@ -141,7 +152,11 @@ async function loop() {
     console.error('Error:', e.message);
   }
 
-  setTimeout(loop, 1000);
+  await question('\nPress ENTER to continue...');
+  console.clear();
+  setTimeout(loop, 100);
 }
+
+console.clear();
 
 loop();
