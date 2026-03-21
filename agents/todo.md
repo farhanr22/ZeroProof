@@ -16,3 +16,9 @@
   - [x] Created `tools/mongo-express/docker-compose.yml`
   - [x] Created `tools/mongo-express/start.sh` quick-start script
   - [x] Verified connection and authentication
+
+## Phase 11: Terminal Demo Clients (Completed)
+- [x] Admin App CLI (login, create/activate, insights)
+- [x] Notification App CLI (poll, print SMS, confirm)
+- [x] Client App CLI (verify SPKI hash, answer single question, verify Token Hash, submit)
+- [x] Write `DEMO_RUNBOOK.md` instructions

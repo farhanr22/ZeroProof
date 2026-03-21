@@ -1,0 +1,15 @@
+{
+  "name": "terminal-clients",
+  "version": "1.0.0",
+  "description": "Terminal clients for Zero-Trust Demo",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "admin": "node admin-app/index.js",
+    "notification": "node notification-app/index.js",
+    "client": "node client-app/index.js"
+  },
+  "dependencies": {
+    "@cloudflare/blindrsa-ts": "^0.4.4"
+  }
+}
