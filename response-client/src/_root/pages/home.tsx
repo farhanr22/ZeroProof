@@ -125,25 +125,26 @@ export default function Home() {
   return (
     <div className="container mx-auto max-w-5xl px-4 py-8 lg:mt-16 mt-8 md:mt-12 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl text-foreground">
-          Zero-Trust Anonymous Feedback
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl" style={{ color: '#0F172A' }}>
+          <span style={{ color: '#2563EB' }}>Zero-Trust</span>{' '}
+          <span style={{ color: '#64748B' }}>Anonymous Feedback</span>
         </h1>
-        <p className="text-muted-foreground text-lg max-w-[600px]">
+        <p className="text-lg max-w-[600px]" style={{ color: '#64748B' }}>
           Submit your anonymous response. The server can verify it came from an authorized respondent — but it cannot link it to you.
         </p>
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Your Campaigns</h2>
+        <h2 className="text-2xl font-semibold tracking-tight" style={{ color: '#0F172A' }}>Your Campaigns</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Join card */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Card className="flex flex-col items-center justify-center p-6 border-dashed border-2 hover:border-primary/50 hover:bg-muted/50 cursor-pointer transition-colors min-h-45 group shadow-sm col-span-1">
-                <div className="rounded-full bg-primary/10 p-4 mb-3 group-hover:bg-primary/20 transition-colors">
-                  <Plus className="h-8 w-8 text-primary" />
+              <Card className="flex flex-col items-center justify-center p-6 border-dashed border-2 cursor-pointer transition-colors min-h-45 group shadow-sm col-span-1" style={{ borderColor: '#E2E8F0' }}>
+                <div className="rounded-full p-4 mb-3 transition-colors" style={{ backgroundColor: '#EFF6FF' }}>
+                  <Plus className="h-8 w-8" style={{ color: '#2563EB' }} />
                 </div>
-                <h3 className="font-medium text-lg">Join Campaign</h3>
+                <h3 className="font-medium text-lg" style={{ color: '#0F172A' }}>Join Campaign</h3>
                 <p className="text-sm text-muted-foreground mt-1 text-center">
                   Paste the access URL from your invite.
                 </p>
@@ -306,7 +307,8 @@ export default function Home() {
             campaigns.map((campaign) => (
               <Card
                 key={campaign.id}
-                className="flex flex-col pt-6 transition-all hover:shadow-md border-primary/20 bg-muted/10 col-span-1 cursor-pointer"
+                className="flex flex-col pt-6 transition-all hover:shadow-md col-span-1 cursor-pointer"
+                style={{ borderColor: '#E2E8F0', backgroundColor: '#FAFBFF' }}
                 onClick={() =>
                   campaign.status === "pending"
                     ? navigate(`/feedback/${campaign.id}`)
@@ -316,14 +318,15 @@ export default function Home() {
                 <CardContent className="flex-1 space-y-3 pb-4">
                   <div className="flex items-start gap-3">
                     <div
-                      className="bg-muted/30 rounded-lg border w-12 h-12 flex items-center justify-center shrink-0"
+                      className="rounded-lg border w-12 h-12 flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: '#EFF6FF', borderColor: '#DBEAFE' }}
                       dangerouslySetInnerHTML={{
                         __html: jdenticon.toSvg(campaign.securityHash, 40),
                       }}
                     />
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-base line-clamp-1">{campaign.name}</h3>
-                      <p className="text-xs text-muted-foreground truncate mt-0.5">
+                      <h3 className="font-semibold text-base line-clamp-1" style={{ color: '#0F172A' }}>{campaign.name}</h3>
+                      <p className="text-xs truncate mt-0.5" style={{ color: '#64748B' }}>
                         {campaign.serverUrl}
                       </p>
                     </div>
@@ -348,6 +351,7 @@ export default function Home() {
                   {campaign.status === "pending" ? (
                     <Button
                       className="w-full shadow-sm"
+                      style={{ backgroundColor: '#0F172A', color: '#fff' }}
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/feedback/${campaign.id}`);
@@ -358,7 +362,8 @@ export default function Home() {
                   ) : (
                     <Button
                       variant="outline"
-                      className="w-full shadow-sm border-primary/20"
+                      className="w-full shadow-sm"
+                      style={{ borderColor: '#E2E8F0', color: '#0F172A' }}
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/response/${campaign.id}`);
