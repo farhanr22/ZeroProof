@@ -245,7 +245,7 @@ export default function LandingPage() {
 
             <IconButton
               variant="outlined"
-              component="a" href="https://" target="_blank"
+              component="a" href="https://github.com/farhanr22/ZeroProof/" target="_blank"
               sx={{
                 border: `1px solid ${BORDER_COLOR}`,
                 borderRadius: 1,
@@ -272,9 +272,9 @@ export default function LandingPage() {
 
           {/* Changed to Stack to guarantee side-by-side equal height flex distribution on md+ screens */}
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={4} sx={{ alignItems: 'stretch' }}>
-            <Card variant="outlined" sx={{ flex: 1, borderColor: BORDER_COLOR }}>
+            <Card variant="outlined" sx={{ flex: 1, borderColor: BORDER_COLOR, padding: 2 }}>
               <CardHeader
-                avatar={<ReportProblemIcon sx={{ color: '#F59E0B', fontSize: 32 }} />}
+                avatar={<ReportProblemIcon sx={{ color: '#F59E0B', fontSize: 27 }} />}
                 title={<Typography variant="h6" color="#F59E0B">Open to Everyone</Typography>}
                 sx={{ pb: 0 }}
               />
@@ -285,9 +285,9 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card variant="outlined" sx={{ flex: 1, borderColor: BORDER_COLOR }}>
+            <Card variant="outlined" sx={{ flex: 1, borderColor: BORDER_COLOR, padding: 2  }}>
               <CardHeader
-                avatar={<LockPersonIcon sx={{ color: '#EF4444', fontSize: 32 }} />}
+                avatar={<LockPersonIcon sx={{ color: '#EF4444', fontSize: 27 }} />}
                 title={<Typography variant="h6" color="#EF4444">Requires Trusting Someone</Typography>}
                 sx={{ pb: 0 }}
               />
