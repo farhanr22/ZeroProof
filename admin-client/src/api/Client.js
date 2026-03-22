@@ -34,8 +34,12 @@ export async function apiClient(method, path, body = null) {
   if (res.status === 401) {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem('snackoverflow_admin_email');
-    window.location.href = '/login';
-    throw new Error(json.error_message || 'Session expired. Please log in again.');
+    
+    // Only redirect if this wasn't a login attempt itself
+    if (path !== '/auth/login') {
+      window.location.href = '/login';
+    }
+    throw new Error(json.error_message || 'Invalid credentials or expired session.');
   }
 
   // Handle API-level errors

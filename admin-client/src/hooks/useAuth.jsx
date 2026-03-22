@@ -37,8 +37,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(EMAIL_KEY);
-    setUser(null);
-    navigate('/login', { replace: true });
+    window.location.href = '/';
   };
 
   const changePassword = async (oldPassword, newPassword) => {
