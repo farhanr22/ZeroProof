@@ -65,7 +65,7 @@ export default function QuestionEditor({ index, question, onRemove, onUpdate, on
 
         {/* Info text for rating type */}
         {question.type === 'rating' && (
-          <Box pl={2} borderLeft="3px solid #E2E8F0">
+          <Box pl={2} borderLeft="3px solid #E2E8F0" mt={2}>
             <Typography variant="caption" color="text.secondary">
               Respondents will use a slider to rate from 1 to 10. No options needed.
             </Typography>

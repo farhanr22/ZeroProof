@@ -182,7 +182,7 @@ export default function ManageQuestions() {
         <Box display="flex" alignItems="center" gap={2}>
           <Typography variant="h4" fontWeight="bold">Questionnaire Builder</Typography>
           {hasUnsavedChanges && (
-            <Typography variant="caption" color="warning.main" fontWeight="bold" sx={{ bgcolor: 'warning.light', px: 1, py: 0.5, borderRadius: 1, opacity: 0.8 }}>
+            <Typography variant="caption" color="error.main" fontWeight="bold" sx={{ bgcolor: 'hsla(55, 100%, 85%)', px: 1, py: 0.5, borderRadius: 1, border: '1px solid #fff9c4' }}>
               Unsaved
             </Typography>
           )}
