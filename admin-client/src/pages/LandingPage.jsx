@@ -157,7 +157,7 @@ export default function LandingPage() {
               )}
               <IconButton
                 component="a"
-                href="https://github.com"
+                href="https://github.com/farhanr22/ZeroProof/"
                 target="_blank"
                 rel="noopener"
                 color="inherit"
@@ -545,7 +545,7 @@ export default function LandingPage() {
           </Typography>
           <IconButton
             component="a"
-            href="https://github.com"
+            href="https://github.com/farhanr22/ZeroProof/"
             target="_blank"
             rel="noopener"
             color="inherit"

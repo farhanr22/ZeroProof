@@ -35,7 +35,7 @@ export default function NavBar() {
         </div>
 
         <a 
-          href="https://github.com" 
+          href="https://github.com/farhanr22/ZeroProof/" 
           target="_blank" 
           rel="noopener noreferrer"
           className="flex items-center justify-center rounded-md p-2 text-black transition-colors hover:bg-accent hover:text-accent-foreground"
