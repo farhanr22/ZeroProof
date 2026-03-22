@@ -92,4 +92,5 @@ export const responsesAPI = {
 
 export const insightsAPI = {
   get: (campaignId) => apiClient('GET', `/campaigns/${campaignId}/insights`),
+  analyze: (campaignId) => apiClient('POST', `/campaigns/${campaignId}/ai-analyze`),
 };

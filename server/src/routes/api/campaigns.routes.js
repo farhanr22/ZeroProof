@@ -56,6 +56,13 @@ router.post('/:id/ai-generate', validate(generateQuestionsSchema), asyncHandler(
   sendResponse(res, { questions });
 }));
 
+router.post('/:id/ai-analyze', asyncHandler(async (req, res) => {
+  const campaign = await campaignService.getCampaignById(req.user.user_id, req.params.id);
+  const insights = await insightsService.getInsights(req.user.user_id, req.params.id);
+  const analysis = await aiService.analyzeInsights(campaign.name, campaign.description, insights);
+  sendResponse(res, { analysis });
+}));
+
 
 import * as insightsService from '../../services/insights.service.js';
 

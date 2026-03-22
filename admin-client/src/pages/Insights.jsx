@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Container, Typography, Button, Paper, Box, Divider, Skeleton, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Container, Typography, Button, Paper, Box, Divider, Skeleton, Alert, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { insightsAPI } from '../api/Client.js';
 
 const TallyProgressBar = ({ label, percentage, count }) => (
@@ -27,6 +28,8 @@ export default function Insights() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [textModal, setTextModal] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
 
   useEffect(() => { loadInsights(); }, [id]);
 
@@ -43,6 +46,19 @@ export default function Insights() {
     }
   };
 
+  const handleAnalyze = async () => {
+    setIsAnalyzing(true);
+    setError(null);
+    try {
+      const data = await insightsAPI.analyze(id);
+      setAnalysisResult(data.analysis);
+    } catch (err) {
+      setError(err.message || 'Failed to generate AI analysis.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const totalResponses = questions.reduce((max, q) => Math.max(max, q.total_answers || 0), 0);
 
   return (
@@ -51,11 +67,22 @@ export default function Insights() {
         Back to Overview
       </Button>
 
-      <Box mb={4}>
-        <Typography variant="h4" fontWeight="bold">Analytics & Insights</Typography>
-        <Typography color="text.secondary">
-          {!isLoading ? `Based on ${totalResponses} total responses` : 'Loading...'}
-        </Typography>
+      <Box mb={4} display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
+        <Box>
+          <Typography variant="h4" fontWeight="bold">Analytics &amp; Insights</Typography>
+          <Typography color="text.secondary">
+            {!isLoading ? `Based on ${totalResponses} total responses` : 'Loading...'}
+          </Typography>
+        </Box>
+        <Button
+          variant="outlined"
+          color="primary"
+          startIcon={isAnalyzing ? <CircularProgress size={18} color="inherit" /> : <AutoAwesomeIcon />}
+          onClick={handleAnalyze}
+          disabled={isLoading || isAnalyzing || questions.length === 0}
+        >
+          {isAnalyzing ? 'Summarizing...' : 'Summarize'}
+        </Button>
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
@@ -172,6 +199,23 @@ export default function Insights() {
         </DialogContent>
         <DialogActions sx={{ p: 2, borderTop: '1px solid #E2E8F0' }}>
           <Button onClick={() => setTextModal(null)} variant="contained">Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* AI Analysis Modal */}
+      <Dialog open={!!analysisResult} onClose={() => setAnalysisResult(null)} fullWidth maxWidth="sm">
+        <DialogTitle fontWeight="bold" display="flex" alignItems="center" gap={1} borderBottom="1px solid #E2E8F0">
+          <AutoAwesomeIcon color="primary" /> AI Analysis
+        </DialogTitle>
+        <DialogContent sx={{ mt: 2 }}>
+          {analysisResult?.split('\n\n').map((para, i) => (
+            <Typography key={i} variant="body2" color="text.primary" mb={2} lineHeight={1.5}>
+              {para}
+            </Typography>
+          ))}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #E2E8F0' }}>
+          <Button onClick={() => setAnalysisResult(null)} variant="contained">Close</Button>
         </DialogActions>
       </Dialog>
     </Container>
