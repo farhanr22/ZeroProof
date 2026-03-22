@@ -220,7 +220,7 @@ export default function LandingPage() {
 
           <Typography variant="body1" color="text.secondary" sx={{ mb: 6, maxWidth: '550px', mx: 'auto' }}>
             Organizations deserve honest input. Respondents deserve real privacy.
-            A cryptographic protocol that guarantees both — no compromises when the stakes are high.
+            A cryptography-backed system that guarantees both — no compromises when the stakes are high.
           </Typography>
 
           <Stack direction="row" spacing={3} justifyContent="center" alignItems="center">
