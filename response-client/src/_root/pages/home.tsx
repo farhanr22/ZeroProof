@@ -135,7 +135,7 @@ export default function Home() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight" style={{ color: '#0F172A' }}>Your Campaigns</h2>
+        <h2 className="text-2xl font-semibold tracking-tight" style={{ color: 'hsla(0, 0%, 26%, 1.00)' }}>Your Campaigns</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Join card */}
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -144,7 +144,7 @@ export default function Home() {
                 <div className="rounded-full p-4 mb-3 transition-colors" style={{ backgroundColor: '#EFF6FF' }}>
                   <Plus className="h-8 w-8" style={{ color: '#2563EB' }} />
                 </div>
-                <h3 className="font-medium text-lg" style={{ color: '#0F172A' }}>Join Campaign</h3>
+                <h3 className="font-medium text-lg" style={{ color: 'hsla(0, 0%, 26%, 1.00)' }}>Join Campaign</h3>
                 <p className="text-sm text-muted-foreground mt-1 text-center">
                   Paste the access URL from your invite.
                 </p>
@@ -298,7 +298,7 @@ export default function Home() {
               <div className="rounded-full bg-muted p-4 mb-3">
                 <MessageSquare className="h-8 w-8 text-muted-foreground" />
               </div>
-              <h3 className="font-medium text-lg">No Campaigns Yet</h3>
+              <h3 className="font-medium text-lg" style={{ color: 'hsla(0, 0%, 26%, 1.00)' }}>No Campaigns Yet</h3>
               <p className="text-sm text-muted-foreground mt-1 text-center">
                 Join a campaign using an access URL from your invite.
               </p>

@@ -9,7 +9,7 @@ export default function NavBar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex h-16 md:h-20 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-md">
       <div className="flex items-center gap-2">
-        <span className="text-xl font-bold tracking-tight">ZeroProof</span>
+        <span className="text-xl font-bold tracking-tight"><span style={{ color: '#2563EB' }}>ZeroProof Client</span></span>
       </div>
 
       <div className="flex items-center gap-6">
@@ -40,6 +40,7 @@ export default function NavBar() {
           rel="noopener noreferrer"
           className="flex items-center justify-center rounded-md p-2 text-black transition-colors hover:bg-accent hover:text-accent-foreground"
           title="View on GitHub"
+          
         >
           <Github className="h-5 w-5" />
           <span className="sr-only">GitHub</span>
