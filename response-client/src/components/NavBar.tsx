@@ -9,7 +9,7 @@ export default function NavBar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex h-16 md:h-20 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-md">
       <div className="flex items-center gap-2">
-        <span className="text-xl font-bold tracking-tight">SnackOverflow</span>
+        <span className="text-xl font-bold tracking-tight">ZeroProof</span>
       </div>
 
       <div className="flex items-center gap-6">

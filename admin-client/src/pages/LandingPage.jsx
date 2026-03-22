@@ -143,7 +143,7 @@ export default function LandingPage() {
         <Container maxWidth="xl">
           <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: '64px' }}>
             <Typography variant="h6" sx={{ color: ACCENT, fontWeight: 'bold' }}>
-              SnackOverflow
+              ZeroProof
             </Typography>
             <Stack direction="row" spacing={2} alignItems="center">
               {user ? (

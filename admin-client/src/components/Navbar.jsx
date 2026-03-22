@@ -107,9 +107,8 @@ export default function Navbar() {
         <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: { xs: 64, sm: 72 } }}>
           
           <Box component={RouterLink} to={user ? "/campaigns" : "/"} sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none', color: 'primary.main', transition: 'all 0.2s', '&:hover': { opacity: 0.8 } }}>
-            <ShieldOutlinedIcon color="secondary" fontSize="large" />
             <Typography variant="h6" fontWeight="bold" letterSpacing={-0.5} sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
-              SnackOverflow
+              ZeroProof
             </Typography>
           </Box>
 
