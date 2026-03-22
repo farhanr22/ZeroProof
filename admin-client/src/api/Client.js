@@ -81,6 +81,8 @@ export const questionsAPI = {
   list: (campaignId) => apiClient('GET', `/campaigns/${campaignId}/questions`),
   update: (campaignId, questions) =>
     apiClient('PATCH', `/campaigns/${campaignId}/questions`, { questions }),
+  generate: (campaignId, prompt) =>
+    apiClient('POST', `/campaigns/${campaignId}/ai-generate`, { prompt }),
 };
 
 // ── Responses & Insights ──────────────────────────

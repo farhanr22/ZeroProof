@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Container, Typography, Button, Box, Skeleton, Alert, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Container, Typography, Button, Box, Skeleton, Alert, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { useParams, Link, useNavigate, useBlocker } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { questionsAPI, campaignsAPI } from '../api/Client.js';
@@ -16,6 +17,9 @@ export default function ManageQuestions() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [campaignMode, setCampaignMode] = useState('draft');
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -97,6 +101,27 @@ export default function ManageQuestions() {
     }
   };
 
+  const handleAiGenerate = async () => {
+    if (!aiPrompt.trim()) return;
+    setIsAiGenerating(true);
+    setError(null);
+    try {
+      const data = await questionsAPI.generate(id, aiPrompt);
+      const aiQuestions = data.questions.map((q, i) => ({
+        _id: `ai_${Date.now()}_${i}`,
+        ...q
+      }));
+      setQuestions(aiQuestions);
+      setIsAiModalOpen(false);
+      setAiPrompt("");
+      setSuccess("AI generated questions successfully! Review them and click Save All.");
+    } catch (err) {
+      setError(err.message || "Failed to generate questions using AI.");
+    } finally {
+      setIsAiGenerating(false);
+    }
+  };
+
   const addEmptyQuestion = () => {
     setQuestions([...questions, { _id: Date.now().toString(), type: 'text', text: '', options: [] }]);
   };
@@ -163,9 +188,14 @@ export default function ManageQuestions() {
           )}
         </Box>
         {isDraft && (
-          <Button variant="contained" color="primary" startIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />} onClick={handleSave} disabled={isSaving}>
-            Save All
-          </Button>
+          <Box display="flex" gap={2} flexWrap="wrap">
+            <Button variant="outlined" color="primary" startIcon={<AutoAwesomeIcon />} onClick={() => setIsAiModalOpen(true)} disabled={isSaving || isAiGenerating}>
+              Generate
+            </Button>
+            <Button variant="contained" color="primary" startIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />} onClick={handleSave} disabled={isSaving || isAiGenerating}>
+              Save All
+            </Button>
+          </Box>
         )}
       </Box>
 
@@ -214,6 +244,37 @@ export default function ManageQuestions() {
           </Button>
           <Button onClick={() => blocker.proceed()} color="error">
             Discard & Leave
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* AI Generate Modal */}
+      <Dialog open={isAiModalOpen} onClose={() => !isAiGenerating && setIsAiModalOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle fontWeight="bold" display="flex" alignItems="center" gap={1}>
+          <AutoAwesomeIcon color="primary" /> Generate Questions with AI
+        </DialogTitle>
+        <DialogContent>
+          <Typography mb={2}>
+            Describe your organization and tell us about your feedback campaign. The AI will generate up to 5 varied questions for you.
+          </Typography>
+          <TextField
+            autoFocus
+            fullWidth
+            multiline
+            rows={4}
+            variant="outlined"
+            placeholder="Organization details and feedback requirements.."
+            value={aiPrompt}
+            onChange={(e) => setAiPrompt(e.target.value)}
+            disabled={isAiGenerating}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setIsAiModalOpen(false)} color="inherit" disabled={isAiGenerating}>
+            Cancel
+          </Button>
+          <Button onClick={handleAiGenerate} variant="contained" color="primary" disabled={!aiPrompt.trim() || isAiGenerating} startIcon={isAiGenerating ? <CircularProgress size={18} color="inherit" /> : <AutoAwesomeIcon />}>
+            {isAiGenerating ? "Generating..." : "Generate"}
           </Button>
         </DialogActions>
       </Dialog>

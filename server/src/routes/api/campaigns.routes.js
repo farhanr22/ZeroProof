@@ -46,6 +46,17 @@ router.delete('/:id', asyncHandler(async (req, res) => {
   sendResponse(res, { success: true });
 }));
 
+import * as aiService from '../../services/ai.service.js';
+import { generateQuestionsSchema } from '../../schemas/ai.schema.js';
+
+router.post('/:id/ai-generate', validate(generateQuestionsSchema), asyncHandler(async (req, res) => {
+  const campaign = await campaignService.getCampaignById(req.user.user_id, req.params.id);
+  // generate questions based on the user's prompt and campaign context
+  const questions = await aiService.generateQuestions(req.body.prompt, campaign.name, campaign.description);
+  sendResponse(res, { questions });
+}));
+
+
 import * as insightsService from '../../services/insights.service.js';
 
 // ... other endpoints earlier ...
