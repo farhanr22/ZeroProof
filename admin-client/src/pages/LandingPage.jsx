@@ -245,7 +245,7 @@ export default function LandingPage() {
 
             <IconButton
               variant="outlined"
-              component="a" href="https://github.com" target="_blank"
+              component="a" href="https://" target="_blank"
               sx={{
                 border: `1px solid ${BORDER_COLOR}`,
                 borderRadius: 1,
