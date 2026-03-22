@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Box, Skeleton, Alert, CircularProgress } from '@mui/material';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Container, Typography, Button, Box, Skeleton, Alert, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate, useBlocker } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { questionsAPI, campaignsAPI } from '../api/Client.js';
 import QuestionEditor from '../components/QuestionEditor.jsx'; 
@@ -11,6 +10,7 @@ import QuestionEditor from '../components/QuestionEditor.jsx';
 export default function ManageQuestions() {
   const { id } = useParams();
   const [questions, setQuestions] = useState([]);
+  const [savedSnapshot, setSavedSnapshot] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -30,7 +30,9 @@ export default function ManageQuestions() {
         campaignsAPI.get(id),
       ]);
       const qs = questionsRes.questions;
-      setQuestions(qs.length > 0 ? qs : [{ _id: Date.now().toString(), type: 'text', text: '', options: [] }]);
+      const initial = qs.length > 0 ? qs : [{ _id: Date.now().toString(), type: 'text', text: '', options: [] }];
+      setQuestions(initial);
+      setSavedSnapshot(JSON.stringify(initial));
       setCampaignMode(campaignRes.campaign.mode);
     } catch (err) {
       setError(err.message);
@@ -40,19 +42,36 @@ export default function ManageQuestions() {
   };
 
   const isDraft = campaignMode === 'draft';
+  const hasUnsavedChanges = isDraft && !isLoading && JSON.stringify(questions) !== savedSnapshot;
+
+  // Block navigation when there are unsaved changes
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasUnsavedChanges && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  // Also warn on browser tab close / refresh
+  useEffect(() => {
+    const handler = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [hasUnsavedChanges]);
 
   const handleSave = async () => {
     setError(null);
     setSuccess(null);
 
-    // Validate: every question must have text
     const invalid = questions.find(q => !q.text.trim());
     if (invalid) {
       setError("All questions must have text. Please fill in the empty question(s).");
       return;
     }
 
-    // Validate: choice questions must have at least 2 options
     const badChoice = questions.find(q => q.type.includes('choice') && q.options.filter(o => o.trim()).length < 2);
     if (badChoice) {
       setError("Choice questions need at least 2 non-empty options.");
@@ -61,7 +80,6 @@ export default function ManageQuestions() {
 
     setIsSaving(true);
     try {
-      // Auto-assign order from array position
       const payload = questions.map((q, i) => ({
         type: q.type,
         text: q.text.trim(),
@@ -70,6 +88,7 @@ export default function ManageQuestions() {
       }));
       const data = await questionsAPI.update(id, payload);
       setQuestions(data.questions);
+      setSavedSnapshot(JSON.stringify(data.questions));
       setSuccess("Questionnaire saved successfully!");
     } catch (err) {
       setError(err.message);
@@ -135,13 +154,18 @@ export default function ManageQuestions() {
       </Button>
 
       <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'stretch', sm: 'center' }} gap={2} mb={4}>
-        <Typography variant="h4" fontWeight="bold">Questionnaire Builder</Typography>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Typography variant="h4" fontWeight="bold">Questionnaire Builder</Typography>
+          {hasUnsavedChanges && (
+            <Typography variant="caption" color="warning.main" fontWeight="bold" sx={{ bgcolor: 'warning.light', px: 1, py: 0.5, borderRadius: 1, opacity: 0.8 }}>
+              Unsaved
+            </Typography>
+          )}
+        </Box>
         {isDraft && (
-          <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
-            <Button variant="contained" color="primary" startIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />} onClick={handleSave} disabled={isSaving}>
-              Save All
-            </Button>
-          </Box>
+          <Button variant="contained" color="primary" startIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />} onClick={handleSave} disabled={isSaving}>
+            Save All
+          </Button>
         )}
       </Box>
 
@@ -175,6 +199,24 @@ export default function ManageQuestions() {
           Add Another Question
         </Button>
       )}
+
+      {/* Unsaved changes warning modal */}
+      <Dialog open={blocker.state === 'blocked'} onClose={() => blocker.reset()}>
+        <DialogTitle fontWeight="bold">Unsaved Changes</DialogTitle>
+        <DialogContent>
+          <Typography>
+            You have unsaved changes to your questionnaire. If you leave now, your edits will be lost.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => blocker.reset()} variant="contained" color="primary">
+            Stay & Edit
+          </Button>
+          <Button onClick={() => blocker.proceed()} color="error">
+            Discard & Leave
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

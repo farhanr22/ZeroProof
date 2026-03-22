@@ -1,30 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Container, Typography, Button, Paper, Box, Divider, Skeleton, Alert } from '@mui/material';
+import { Container, Typography, Button, Paper, Box, Divider, Skeleton, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { insightsAPI } from '../api/Client.js';
 
-// Custom component to mimic the Tally.so percentage bar
 const TallyProgressBar = ({ label, percentage, count }) => (
   <Box sx={{ 
     display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
     mb: 1.5, position: 'relative', overflow: 'hidden',
-    border: '1px solid #E2E8F0', borderRadius: 2,
-    bgcolor: '#ffffff'
+    border: '1px solid #E2E8F0', borderRadius: 2, bgcolor: '#ffffff'
   }}>
-    <Box sx={{ 
-      position: 'absolute', top: 0, left: 0, bottom: 0, 
-      width: `${percentage}%`, bgcolor: '#F1F5F9', zIndex: 0 
-    }} />
+    <Box sx={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: `${percentage}%`, bgcolor: '#F1F5F9', zIndex: 0 }} />
     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', p: 1.5, zIndex: 1 }}>
       <Typography variant="body1" sx={{ color: '#334155' }}>{label}</Typography>
       <Box display="flex" gap={3} alignItems="center">
-        <Typography variant="body2" sx={{ color: '#64748B', minWidth: '30px', textAlign: 'right' }}>
-          {percentage}%
-        </Typography>
-        <Typography variant="body2" sx={{ color: '#94A3B8', minWidth: '80px', textAlign: 'right' }}>
-          {count} response{count !== 1 ? 's' : ''}
-        </Typography>
+        <Typography variant="body2" sx={{ color: '#64748B', minWidth: '30px', textAlign: 'right' }}>{percentage}%</Typography>
+        <Typography variant="body2" sx={{ color: '#94A3B8', minWidth: '80px', textAlign: 'right' }}>{count} response{count !== 1 ? 's' : ''}</Typography>
       </Box>
     </Box>
   </Box>
@@ -32,22 +23,18 @@ const TallyProgressBar = ({ label, percentage, count }) => (
 
 export default function Insights() {
   const { id } = useParams();
-  // Backend returns a flat array of question insight objects
   const [questions, setQuestions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [textModal, setTextModal] = useState(null);
 
-  useEffect(() => {
-    loadInsights();
-  }, [id]);
+  useEffect(() => { loadInsights(); }, [id]);
 
   const loadInsights = async () => {
     setIsLoading(true);
     setError(null);
     try {
       const data = await insightsAPI.get(id);
-      // Backend shape: data.insights is an array of question insight objects
-      // Each has: _id, text, type, total_answers, and type-specific fields (counts, sum, average, distribution, texts)
       setQuestions(Array.isArray(data.insights) ? data.insights : []);
     } catch (err) {
       setError(err.message);
@@ -56,7 +43,6 @@ export default function Insights() {
     }
   };
 
-  // Compute total responses from max total_answers across questions
   const totalResponses = questions.reduce((max, q) => Math.max(max, q.total_answers || 0), 0);
 
   return (
@@ -92,97 +78,72 @@ export default function Insights() {
       ) : (
         <Box display="flex" flexDirection="column" gap={4}>
           {questions.map((q, index) => {
-            // Choice questions — show bar charts
             if (q.type === 'single_choice' || q.type === 'multi_choice') {
-              // Backend returns counts as { "Option A": 5, "Option B": 3 }
               const totalForQ = q.total_answers || 1;
               const stats = Object.entries(q.counts || {})
-                .map(([option, count]) => ({
-                  option,
-                  count,
-                  percentage: Math.round((count / totalForQ) * 100),
-                }))
+                .map(([option, count]) => ({ option, count, percentage: Math.round((count / totalForQ) * 100) }))
                 .sort((a, b) => b.count - a.count);
 
               return (
                 <Box key={q._id}>
-                  <Typography variant="subtitle1" fontWeight="bold" color="primary.main" mb={0.5}>
-                    {index + 1}. {q.text}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" mb={2}>
-                    {q.total_answers} responses
-                  </Typography>
-                  
+                  <Typography variant="subtitle1" fontWeight="bold" color="primary.main" mb={0.5}>{index + 1}. {q.text}</Typography>
+                  <Typography variant="body2" color="text.secondary" mb={2}>{q.total_answers} responses</Typography>
                   {stats.map((stat, i) => (
-                    <TallyProgressBar 
-                      key={i} 
-                      label={stat.option} 
-                      percentage={stat.percentage} 
-                      count={stat.count} 
-                    />
+                    <TallyProgressBar key={i} label={stat.option} percentage={stat.percentage} count={stat.count} />
                   ))}
                   <Divider sx={{ mt: 4 }} />
                 </Box>
               );
             }
 
-            // Rating questions — show average + distribution
             if (q.type === 'rating') {
               const totalForQ = q.total_answers || 1;
               const distEntries = Object.entries(q.distribution || {})
-                .map(([value, count]) => ({
-                  value: Number(value),
-                  count,
-                  percentage: Math.round((count / totalForQ) * 100),
-                }))
+                .map(([value, count]) => ({ value: Number(value), count, percentage: Math.round((count / totalForQ) * 100) }))
                 .sort((a, b) => a.value - b.value);
 
               return (
                 <Box key={q._id}>
-                  <Typography variant="subtitle1" fontWeight="bold" color="primary.main" mb={0.5}>
-                    {index + 1}. {q.text}
-                  </Typography>
+                  <Typography variant="subtitle1" fontWeight="bold" color="primary.main" mb={0.5}>{index + 1}. {q.text}</Typography>
                   <Typography variant="body2" color="text.secondary" mb={2}>
                     {q.total_answers} responses · Average: <strong>{q.average?.toFixed(1) || 'N/A'}</strong>
                   </Typography>
-                  
                   {distEntries.map((d, i) => (
-                    <TallyProgressBar 
-                      key={i} 
-                      label={`Rating ${d.value}`} 
-                      percentage={d.percentage} 
-                      count={d.count} 
-                    />
+                    <TallyProgressBar key={i} label={`Rating ${d.value}`} percentage={d.percentage} count={d.count} />
                   ))}
                   <Divider sx={{ mt: 4 }} />
                 </Box>
               );
             }
 
-            // Text questions — show sample answers
+            // Text questions — show 2 previews + "Show All" button
+            const allTexts = q.texts || [];
+            const previewTexts = allTexts.slice(0, 2);
+
             return (
               <Box key={q._id}>
-                <Typography variant="subtitle1" fontWeight="bold" color="primary.main" mb={0.5}>
-                  {index + 1}. {q.text}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" mb={2}>
-                  {q.total_answers} responses
-                </Typography>
-                {q.texts && q.texts.length > 0 ? (
+                <Typography variant="subtitle1" fontWeight="bold" color="primary.main" mb={0.5}>{index + 1}. {q.text}</Typography>
+                <Typography variant="body2" color="text.secondary" mb={2}>{q.total_answers} responses</Typography>
+                {previewTexts.length > 0 ? (
                   <Box display="flex" flexDirection="column" gap={1.5}>
-                    {q.texts.slice(0, 10).map((answer, i) => (
+                    {previewTexts.map((answer, i) => (
                       <Paper key={i} elevation={0} sx={{ p: 2, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 1 }}>
-                        <Typography variant="body2" fontStyle="italic" color="text.secondary">
-                          "{answer}"
-                        </Typography>
+                        <Typography variant="body2" fontStyle="italic" color="text.secondary">"{answer}"</Typography>
                       </Paper>
                     ))}
+                    {allTexts.length > 2 && (
+                      <Button
+                        variant="outlined" size="small"
+                        onClick={() => setTextModal({ text: q.text, texts: allTexts })}
+                        sx={{ alignSelf: 'flex-start', mt: 0.5 }}
+                      >
+                        Show All {allTexts.length} Responses
+                      </Button>
+                    )}
                   </Box>
                 ) : (
                   <Paper elevation={0} sx={{ p: 3, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 2 }}>
-                    <Typography color="text.secondary" fontStyle="italic">
-                      No text responses yet.
-                    </Typography>
+                    <Typography color="text.secondary" fontStyle="italic">No text responses yet.</Typography>
                   </Paper>
                 )}
                 <Divider sx={{ mt: 4 }} />
@@ -191,6 +152,28 @@ export default function Insights() {
           })}
         </Box>
       )}
+
+      {/* Text responses modal */}
+      <Dialog open={!!textModal} onClose={() => setTextModal(null)} fullWidth maxWidth="sm">
+        <DialogTitle fontWeight="bold" borderBottom="1px solid #E2E8F0">
+          All Text Responses
+          <Typography variant="body2" color="text.secondary" mt={0.5}>{textModal?.text}</Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 3 }}>
+          <Box display="flex" flexDirection="column" gap={1.5}>
+            {textModal?.texts.map((answer, i) => (
+              <Paper key={i} elevation={0} sx={{ p: 2, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  <strong style={{ color: '#64748B' }}>#{i + 1}</strong> — "{answer}"
+                </Typography>
+              </Paper>
+            ))}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #E2E8F0' }}>
+          <Button onClick={() => setTextModal(null)} variant="contained">Close</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

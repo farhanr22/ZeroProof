@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth.jsx';
 import Navbar from './components/Navbar.jsx';
 
@@ -31,30 +31,36 @@ const ConditionalNavbar = () => {
   return <Navbar />;
 };
 
-function App() {
+const RootLayout = () => {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <ConditionalNavbar />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/LandingPage" element={<Navigate to="/" replace />} />
-          
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+    <AuthProvider>
+      <ConditionalNavbar />
+      <Outlet />
+    </AuthProvider>
+  );
+};
 
-          {/* ALL DASHBOARD ROUTES ARE NOW PROTECTED */}
-          <Route path="/campaigns" element={<ProtectedRoute><Campaigns /></ProtectedRoute>} />
-          <Route path="/campaigns/:id" element={<ProtectedRoute><CampaignOverview /></ProtectedRoute>} />
-          <Route path="/campaigns/:id/contacts" element={<ProtectedRoute><ManageContacts /></ProtectedRoute>} />
-          <Route path="/campaigns/:id/questions" element={<ProtectedRoute><ManageQuestions /></ProtectedRoute>} />
-          <Route path="/campaigns/:id/responses" element={<ProtectedRoute><Responses /></ProtectedRoute>} />
-          <Route path="/campaigns/:id/insights" element={<ProtectedRoute><Insights /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
-  )
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      { path: "/", element: <LandingPage /> },
+      { path: "/LandingPage", element: <Navigate to="/" replace /> },
+      { path: "/login", element: <Login /> },
+      { path: "/signup", element: <Signup /> },
+      { path: "/campaigns", element: <ProtectedRoute><Campaigns /></ProtectedRoute> },
+      { path: "/campaigns/:id", element: <ProtectedRoute><CampaignOverview /></ProtectedRoute> },
+      { path: "/campaigns/:id/contacts", element: <ProtectedRoute><ManageContacts /></ProtectedRoute> },
+      { path: "/campaigns/:id/questions", element: <ProtectedRoute><ManageQuestions /></ProtectedRoute> },
+      { path: "/campaigns/:id/responses", element: <ProtectedRoute><Responses /></ProtectedRoute> },
+      { path: "/campaigns/:id/insights", element: <ProtectedRoute><Insights /></ProtectedRoute> },
+      { path: "/settings", element: <ProtectedRoute><Settings /></ProtectedRoute> },
+    ]
+  }
+]);
+
+function App() {
+  return <RouterProvider router={router} />;
 }
 
 export default App;
