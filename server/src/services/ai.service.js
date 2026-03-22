@@ -120,7 +120,7 @@ ${textContext}
 
 Based on all of the above, write a short, friendly summary of the feedback. Keep it simple and easy to read — no jargon, no fancy language. 
 Break your response into two short paragraphs of 3-5 short, simple sentences each. Each sentence should be simple and convey a singular thought. Highlight what stands out, any clear patterns, and anything the team might want to act on. If the data is limited or not very conclusive, just say so honestly — that's fine.
-Don't go above two short paragraphs unless there is a lot of questions and interesting analysis to be made. Your aim is to give an executive summary, not a thesis report.`;
+Don't go above two short paragraphs unless there is a lot of questions and interesting analysis to be made. Your aim is to give an executive summary, not a thesis report. If there's very little data, give one or two sentences only.`;
 
   const completion = await openai.chat.completions.create({
     model: AI_MODEL,
