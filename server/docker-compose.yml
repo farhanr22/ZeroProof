@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zerotrust-server
+    restart: unless-stopped
+    ports:
+      - "3456:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    networks:
+      - zerotrust-network
+
+networks:
+  zerotrust-network:
+    driver: bridge
+
+volumes:
+  zerotrust-mongo-data:

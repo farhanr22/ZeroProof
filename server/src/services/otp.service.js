@@ -2,7 +2,7 @@ import { Contact } from '../models/Contact.js';
 import { Campaign } from '../models/Campaign.js';
 import { ApiError } from '../core/errors.js';
 
-const CLIENT_APP_DOMAIN = process.env.CLIENT_APP_DOMAIN || 'http://localhost:3000';
+const SELF_DOMAIN = process.env.SELF_DOMAIN || 'http://localhost:3000';
 
 /**
  * Claims a lease on the next available unsent contact.
@@ -50,11 +50,11 @@ export const lockNextContact = async (sender_id) => {
   const campaign = await Campaign.findById(contact.campaign_id).select('name');
 
   return {
-    contact_id:    contact._id,
-    campaign_id:   contact.campaign_id, // kept internally for confirm/release calls
+    contact_id: contact._id,
+    campaign_id: contact.campaign_id, // kept internally for confirm/release calls
     campaign_name: campaign?.name ?? 'Survey',
-    value:         contact.value,
-    access_url:    `${CLIENT_APP_DOMAIN}/start?otp=${contact.otp}`
+    value: contact.value,
+    access_url: `${SELF_DOMAIN}/start?otp=${contact.otp}`
   };
 };
 
@@ -76,7 +76,7 @@ export const releaseLock = async (contact_id, campaign_id, sender_id) => {
 
   const contact = await Contact.findOneAndUpdate(
     { _id: contact_id, campaign_id, 'send_lock.locked_by': sender_id },
-    { 
+    {
       $set: { 'send_lock.locked_by': null, 'send_lock.locked_at': null },
       $inc: { failures: 1 }
     },
