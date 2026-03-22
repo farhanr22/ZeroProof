@@ -126,10 +126,10 @@ export default function Home() {
     <div className="container mx-auto max-w-5xl px-4 py-8 lg:mt-16 mt-8 md:mt-12 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight md:text-4xl text-foreground">
-          Anonymous Feedback
+          Zero-Trust Anonymous Feedback
         </h1>
-        <p className="text-muted-foreground text-lg">
-          Zero-knowledge. Your response is cryptographically anonymous.
+        <p className="text-muted-foreground text-lg max-w-[600px]">
+          Submit your anonymous response. The server can verify it came from an authorized respondent — but it cannot link it to you.
         </p>
       </div>
 
