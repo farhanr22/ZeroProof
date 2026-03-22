@@ -121,9 +121,9 @@ export default function Responses() {
             Anonymous response · {selectedResponse && new Date(selectedResponse.submitted_at).toLocaleString()}
           </Typography>
         </DialogTitle>
-        <DialogContent sx={{ pt: 3 }}>
+        <DialogContent sx={{ mt: 2, mb:0, pb:1 }}>
           {questions.map((q, index) => (
-            <Box key={q._id} mb={3}>
+            <Box key={q._id} mb={2}>
               <Typography variant="subtitle2" color="text.secondary" fontWeight="bold" mb={0.5}>
                 {index + 1}. {q.text}
               </Typography>

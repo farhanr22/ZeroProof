@@ -5,7 +5,7 @@ export const globalTheme = createTheme({
     mode: 'light',
     background: {
       default: '#FFFFFF', // white background
-      paper: '#F8FAFC',   // light slate for cards/surfaces
+      paper: '#fcfcfcff',   // light slate for cards/surfaces
     },
     primary: {
       main: '#0F172A', //Dark Slate/Blue (Primary Text & Buttons)

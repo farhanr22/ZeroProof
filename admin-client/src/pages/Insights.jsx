@@ -128,7 +128,7 @@ export default function Insights() {
                   <Box display="flex" flexDirection="column" gap={1.5}>
                     {previewTexts.map((answer, i) => (
                       <Paper key={i} elevation={0} sx={{ p: 2, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 1 }}>
-                        <Typography variant="body2" fontStyle="italic" color="text.secondary">"{answer}"</Typography>
+                        <Typography variant="body2" color="text.primary">{answer}</Typography>
                       </Paper>
                     ))}
                     {allTexts.length > 2 && (
@@ -159,12 +159,12 @@ export default function Insights() {
           All Text Responses
           <Typography variant="body2" color="text.secondary" mt={0.5}>{textModal?.text}</Typography>
         </DialogTitle>
-        <DialogContent sx={{ pt: 3 }}>
-          <Box display="flex" flexDirection="column" gap={1.5}>
+        <DialogContent sx={{ mt: 3 }}>
+          <Box display="flex" flexDirection="column" gap={2.5}>
             {textModal?.texts.map((answer, i) => (
               <Paper key={i} elevation={0} sx={{ p: 2, bgcolor: '#F8FAFC', border: '1px solid #E2E8F0', borderRadius: 1 }}>
-                <Typography variant="body2" color="text.secondary">
-                  <strong style={{ color: '#64748B' }}>#{i + 1}</strong> — "{answer}"
+                <Typography variant="body2" color="text.primary">
+                  <strong style={{ color: '#64748B' }}>#{i + 1}</strong> &nbsp; {answer}
                 </Typography>
               </Paper>
             ))}

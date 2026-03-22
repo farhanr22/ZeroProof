@@ -56,8 +56,9 @@ export default function Settings() {
           <Typography variant="h6" fontWeight="bold">Account</Typography>
         </Box>
         <Box display="flex" alignItems="center" gap={1.5}>
-          <Typography variant="body1" color="text.secondary">Signed in as</Typography>
-          <Chip label={user?.email || '—'} variant="outlined" color="secondary" size="small" sx={{ fontWeight: 600 }} />
+          <Typography variant="body1" color="text.secondary">
+            Signed in as <Box component="span" fontWeight="bold" color="secondary.main">{user?.email || '—'}</Box>
+          </Typography>
         </Box>
       </Paper>
       
@@ -71,7 +72,7 @@ export default function Settings() {
           You will be logged out of all sessions after changing your password.
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>{error}</Alert>}
+        {error && <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>{error}</Alert>}
 
         <Box component="form" onSubmit={handlePasswordChange}>
           <TextField
@@ -79,7 +80,7 @@ export default function Settings() {
             type={showCurrent ? 'text' : 'password'}
             value={currentPassword} disabled={isLoading}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            sx={{ mb: 2 }}
+            sx={{ mb: 3 }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -90,8 +91,6 @@ export default function Settings() {
               ),
             }}
           />
-          
-          <Divider sx={{ my: 2, borderColor: '#F1F5F9' }} />
           
           <TextField
             size="small" required fullWidth label="New Password"

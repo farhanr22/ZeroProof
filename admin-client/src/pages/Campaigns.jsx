@@ -97,7 +97,7 @@ export default function Campaigns() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 4, mb: 8 }}>
+    <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
       <Box
         display="flex"
         flexDirection={{ xs: 'column', sm: 'row' }}

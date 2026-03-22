@@ -86,69 +86,86 @@ export default function CampaignOverview() {
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>{error}</Alert>
       )}
 
-      <Paper elevation={0} sx={{ p: 4, borderRadius: 2, border: '1px solid #E2E8F0' }}>
-        <Box
-          display="flex"
-          flexDirection={{ xs: 'column', sm: 'row' }}
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', sm: 'center' }}
-          gap={2}
-          mb={3}
-        >
-          <Box>
+      {/* Header section */}
+      <Box mb={4} display="flex" flexDirection={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="flex-start" gap={2}>
+        <Box>
+          <Box display="flex" alignItems="center" gap={2} mb={1}>
             <Typography variant="h4" fontWeight="bold">{campaign.name}</Typography>
-            {campaign.description && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                {campaign.description}
+            {/* Status Pill Indicator */}
+            <Box sx={{ 
+              display: 'inline-flex', alignItems: 'center', gap: 1, 
+              px: 1.5, py: 0.5, borderRadius: 1.5, 
+              bgcolor: campaign.mode === 'active' ? 'rgba(16, 185, 129, 0.1)' : '#F1F5F9',
+              border: '1px solid', borderColor: campaign.mode === 'active' ? '#10B981' : '#E2E8F0'
+            }}>
+              <Box sx={{ 
+                width: 8, height: 8, borderRadius: '50%', 
+                bgcolor: campaign.mode === 'active' ? '#10B981' : '#9CA3AF',
+                boxShadow: campaign.mode === 'active' ? '0 0 8px rgba(16, 185, 129, 0.8)' : 'none'
+              }} />
+              <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 'bold', color: campaign.mode === 'active' ? '#10B981' : '#64748B', letterSpacing: 1 }}>
+                {campaign.mode.toUpperCase()}
               </Typography>
-            )}
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Status: <strong>{campaign.mode.toUpperCase()}</strong>
+            </Box>
+          </Box>
+          {campaign.description && (
+            <Typography variant="body1" color="text.secondary">
+              {campaign.description}
             </Typography>
-          </Box>
-
-          <Box display="flex" gap={1}>
-            {campaign.mode === 'draft' && (
-              <Button
-                variant="contained" color="error"
-                startIcon={isActivating ? <CircularProgress size={18} color="inherit" /> : <WarningAmberIcon />}
-                onClick={handleActivate}
-                disabled={isActivating}
-              >
-                Enable Campaign
-              </Button>
-            )}
-            <Button variant="outlined" color="error" onClick={handleDelete}>
-              Delete
-            </Button>
-          </Box>
-        </Box>
-
-        <Divider sx={{ mb: 3 }} />
-
-        {/* Smooth Hover Navigation Buttons — mode-dependent */}
-        <Box display="flex" gap={2} flexWrap="wrap">
-          {campaign.mode === 'draft' ? (
-            <>
-              <Button component={Link} to={`/campaigns/${id}/contacts`} variant="outlined" sx={{ transition: 'all 0.2s', '&:hover': { bgcolor: 'primary.main', color: 'white' } }}>
-                Manage Contacts
-              </Button>
-              <Button component={Link} to={`/campaigns/${id}/questions`} variant="outlined" sx={{ transition: 'all 0.2s', '&:hover': { bgcolor: 'primary.main', color: 'white' } }}>
-                Manage Questions
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button component={Link} to={`/campaigns/${id}/responses`} variant="contained" color="primary" sx={{ boxShadow: 'none' }}>
-                View Responses
-              </Button>
-              <Button component={Link} to={`/campaigns/${id}/insights`} variant="contained" color="secondary" sx={{ boxShadow: 'none' }}>
-                View Insights
-              </Button>
-            </>
           )}
         </Box>
-      </Paper>
+
+        <Box display="flex" gap={1}>
+          {campaign.mode === 'draft' && (
+            <Button
+              variant="contained" color="success" size="large" sx={{ fontWeight: 'bold' }}
+              startIcon={isActivating ? <CircularProgress size={18} color="inherit" /> : <WarningAmberIcon />}
+              onClick={handleActivate}
+              disabled={isActivating}
+            >
+              Deploy Campaign
+            </Button>
+          )}
+          <Button variant="outlined" color="error" size="large" onClick={handleDelete} sx={{ fontWeight: 'bold' }}>
+            Delete
+          </Button>
+        </Box>
+      </Box>
+
+      {/* Large section navigation cards */}
+      <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
+        {campaign.mode === 'draft' ? (
+          <>
+            <Paper component={Link} to={`/campaigns/${id}/contacts`} elevation={0} sx={{ flex: 1, p: 4, textDecoration: 'none', color: 'inherit', bgcolor: '#ffffff', border: '1px solid #E2E8F0', borderRadius: 2, transition: 'all 0.2s', '&:hover': { borderColor: '#3B82F6', bgcolor: '#EFF6FF', transform: 'translateY(-4px)', boxShadow: '0 12px 24px rgba(59, 130, 246, 0.15)' } }}>
+              <Typography variant="h6" fontWeight="bold" color="primary.main" mb={1}>Manage Contacts</Typography>
+              <Typography variant="body2" color="text.secondary" lineHeight={1.6}>
+                Upload phone numbers or bulk import from files to build the authorized respondent list. They will receive the unique OTPs for feedback.
+              </Typography>
+            </Paper>
+            <Paper component={Link} to={`/campaigns/${id}/questions`} elevation={0} sx={{ flex: 1, p: 4, textDecoration: 'none', color: 'inherit', bgcolor: '#ffffff', border: '1px solid #E2E8F0', borderRadius: 2, transition: 'all 0.2s', '&:hover': { borderColor: '#3B82F6', bgcolor: '#EFF6FF', transform: 'translateY(-4px)', boxShadow: '0 12px 24px rgba(59, 130, 246, 0.15)' } }}>
+              <Typography variant="h6" fontWeight="bold" color="primary.main" mb={1}>Manage Questions</Typography>
+              <Typography variant="body2" color="text.secondary" lineHeight={1.6}>
+                Use the form builder to create text feedback, multiple-choice, and rating scale questions for this campaign.
+              </Typography>
+            </Paper>
+          </>
+        ) : (
+          <>
+            <Paper component={Link} to={`/campaigns/${id}/responses`} elevation={0} sx={{ flex: 1, p: 4, textDecoration: 'none', color: 'inherit', bgcolor: '#ffffff', border: '1px solid #E2E8F0', borderRadius: 2, transition: 'all 0.2s', '&:hover': { borderColor: '#3B82F6', bgcolor: '#EFF6FF', transform: 'translateY(-4px)', boxShadow: '0 12px 24px rgba(59, 130, 246, 0.15)' } }}>
+              <Typography variant="h6" fontWeight="bold" color="primary.main" mb={1}>Raw Responses</Typography>
+              <Typography variant="body2" color="text.secondary" lineHeight={1.6}>
+                Securely view all cryptographically anonymous tabular responses submitted so far. Identities are mathematically un-linkable.
+              </Typography>
+            </Paper>
+            <Paper component={Link} to={`/campaigns/${id}/insights`} elevation={0} sx={{ flex: 1, p: 4, textDecoration: 'none', color: 'inherit', bgcolor: '#ffffff', border: '1px solid #E2E8F0', borderRadius: 2, transition: 'all 0.2s', '&:hover': { borderColor: '#3B82F6', bgcolor: '#EFF6FF', transform: 'translateY(-4px)', boxShadow: '0 12px 24px rgba(59, 130, 246, 0.15)' } }}>
+              <Typography variant="h6" fontWeight="bold" color="primary.main" mb={1}>Analytics & Insights</Typography>
+              <Typography variant="body2" color="text.secondary" lineHeight={1.6}>
+                Access real-time aggregated charts, statistical summaries, and high-level trends isolated from individual user data.
+              </Typography>
+            </Paper>
+          </>
+        )}
+      </Box>
     </Container>
   );
 }

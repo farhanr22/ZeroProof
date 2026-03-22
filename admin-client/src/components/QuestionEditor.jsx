@@ -7,7 +7,7 @@ export default function QuestionEditor({ index, question, onRemove, onUpdate, on
   const showOptions = question.type === 'single_choice' || question.type === 'multi_choice';
 
   return (
-    <Card elevation={0} sx={{ border: '1px solid #E2E8F0', opacity: disabled ? 0.7 : 1 }}>
+    <Card elevation={1} sx={{ border: '1px solid #E2E8F0', opacity: disabled ? 0.7 : 1 }}>
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="subtitle1" fontWeight="bold">Question {index + 1}</Typography>
