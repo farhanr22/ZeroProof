@@ -39,7 +39,7 @@ export default function Signup() {
     <Container component="main" maxWidth="sm" sx={{ py: { xs: 4, md: 8 } }}>
       <Paper elevation={0} sx={{ p: { xs: 3, md: 5}, display: 'flex', flexDirection: 'column', alignItems: 'center', border: '1px solid #E2E8F0', borderRadius: 2 }}>
         
-        <Box sx={{ m: 1, bgcolor: 'primary.main', p: 1.5, borderRadius: '12px', color: 'white' }}>
+        <Box sx={{ m: 1, bgcolor: 'primary.main', p: 1.5, pb: 0.5, borderRadius: '12px', color: 'white' }}>
           <PersonAddOutlined />
         </Box>
         

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { 
-  Container, Box, Typography, TextField, Button, Paper, 
-  InputAdornment, IconButton, Link, CircularProgress, Alert 
+import {
+  Container, Box, Typography, TextField, Button, Paper,
+  InputAdornment, IconButton, Link, CircularProgress, Alert
 } from '@mui/material';
 import { Visibility, VisibilityOff, LockOutlined } from '@mui/icons-material';
-import { useAuth } from '../hooks/useAuth.jsx'; 
+import { useAuth } from '../hooks/useAuth.jsx';
 
 export default function Login() {
-  const { login } = useAuth(); 
-  
+  const { login } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -37,12 +37,12 @@ export default function Login() {
 
   return (
     <Container component="main" maxWidth="sm" sx={{ py: 8 }}>
-      <Paper elevation={0} sx={{ p:{xs : 4,sm:5}, display: 'flex', flexDirection: 'column', alignItems: 'center', border: '1px solid #E2E8F0' }}>
-        
-        <Box sx={{ m: 1, bgcolor: 'secondary.main', p: 1.5, borderRadius: '12px', color: 'white' }}>
+      <Paper elevation={0} sx={{ p: { xs: 4, sm: 5 }, display: 'flex', flexDirection: 'column', alignItems: 'center', border: '1px solid #E2E8F0' }}>
+
+        <Box sx={{ m: 1, bgcolor: 'secondary.main', p: 1.5, pb: 0.5, borderRadius: '12px', color: 'white' }}>
           <LockOutlined />
         </Box>
-        
+
         <Typography component="h1" variant="h5" fontWeight="bold" gutterBottom>
           Welcome Back
         </Typography>
@@ -77,7 +77,7 @@ export default function Login() {
               ),
             }}
           />
-          
+
           <Button type="submit" fullWidth variant="contained" size="large" disabled={isLoading} sx={{ mt: 3, mb: 2, py: 1.5 }}>
             {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
           </Button>
