@@ -9,11 +9,12 @@ import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 
 // Icons
 import GitHubIcon from '@mui/icons-material/GitHub';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import LockPersonIcon from '@mui/icons-material/LockPerson';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import OpenInBrowserIcon from '@mui/icons-material/OpenInBrowser';
 import GroupsIcon from '@mui/icons-material/Groups';
 import VerifiedIcon from '@mui/icons-material/Verified';
@@ -97,10 +98,7 @@ export default function LandingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Custom scroll for "Learn More"
-  const scrollToLearnMore = () => {
-    document.getElementById('learn-more')?.scrollIntoView({ behavior: 'smooth' });
-  };
+
 
   // Carousel ref for Section 5
   const carouselRef = React.useRef(null);
@@ -235,12 +233,21 @@ export default function LandingPage() {
             )}
 
             <Button
-              variant="text"
-              sx={{ color: 'text.secondary', px: 3, py: 1.5, '&:hover': { color: 'text.primary', bgcolor: 'transparent' } }}
-              endIcon={<KeyboardArrowDownIcon />}
-              onClick={scrollToLearnMore}
+              component="a"
+              href="https://farhanr22.github.io/ZeroProof/"
+              target="_blank"
+              variant="outlined"
+              endIcon={<OpenInNewIcon fontSize="small" />}
+              sx={{ 
+                color: 'text.secondary', 
+                px: 3, 
+                py: 1.5, 
+                borderColor: BORDER_COLOR,
+                transition: 'all 0s',
+                '&:hover': { color: 'text.primary', borderColor: 'text.primary', bgcolor: 'transparent' } 
+              }}
             >
-              Learn More
+              Client Web App
             </Button>
 
             <IconButton
