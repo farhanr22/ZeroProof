@@ -24,6 +24,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import logo from '../assets/logo.svg';
 
 import { useAuth } from '../hooks/useAuth.jsx';
 
@@ -135,18 +136,21 @@ export default function LandingPage() {
         sx={{
           backdropFilter: 'blur(12px)',
           borderBottom: `1px solid ${BORDER_COLOR}`,
-          backgroundColor: 'rgba(255, 255, 255, 0.8)'
+          backgroundColor: 'rgba(255, 255, 255, 0.85)'
         }}
       >
         <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: '64px' }}>
-            <Typography variant="h6" sx={{ color: ACCENT, fontWeight: 'bold' }}>
-              ZeroProof
-            </Typography>
-            <Stack direction="row" spacing={2} alignItems="center">
+          <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: { xs: 55, sm: 65 } }}>
+            <Box display="flex" alignItems="center" gap={1.5} sx={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+              <Box component="img" src={logo} sx={{ width: 32, height: 32 }} />
+              <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' }, fontFamily: '"IBM Plex Mono", monospace', color: ACCENT, letterSpacing: '-0.02em' }}>
+                ZeroProof
+              </Typography>
+            </Box>
+            <Stack direction="row" sx={{ gap: { xs: 1, sm: 2 } }} alignItems="center">
               {user ? (
                 <Button variant="outlined" color="primary" onClick={() => navigate('/campaigns')}>
-                  Go to Dashboard
+                  Dashboard
                 </Button>
               ) : (
                 <Button variant="outlined" color="inherit" onClick={() => navigate('/login')} sx={{ borderColor: BORDER_COLOR, color: 'text.primary' }}>
@@ -211,7 +215,7 @@ export default function LandingPage() {
             }}
           />
 
-          <Typography variant="h1" sx={{ fontSize: { xs: '3rem', md: '4.5rem' }, lineHeight: 1.1, mb: 3, color: 'text.primary' }}>
+          <Typography variant="h1" sx={{ fontSize: { xs: '2.5rem', md: '4.5rem' }, lineHeight: 1.1, mb: 3, color: 'text.primary' }}>
             Anonymous feedback.<br />
             <Box component="span" sx={{ color: ACCENT }}>No trust required.</Box>
           </Typography>
@@ -221,10 +225,16 @@ export default function LandingPage() {
             A cryptography-backed system that guarantees both — no compromises when the stakes are high.
           </Typography>
 
-          <Stack direction="row" spacing={3} justifyContent="center" alignItems="center">
+          <Stack 
+            direction={{ xs: 'column', sm: 'row' }} 
+            spacing={2} 
+            justifyContent="center" 
+            alignItems={{ xs: 'stretch', sm: 'center' }}
+            sx={{ maxWidth: { xs: 260, sm: 'none' }, mx: 'auto' }}
+          >
             {user ? (
               <Button variant="contained" color="primary" size="large" onClick={() => navigate('/campaigns')} sx={{ px: 4, py: 1.5, boxShadow: 'none' }}>
-                Enter Dashboard
+                Open Dashboard
               </Button>
             ) : (
               <Button variant="contained" color="primary" size="large" onClick={() => navigate('/signup')} sx={{ px: 4, py: 1.5, boxShadow: 'none' }}>
@@ -232,37 +242,41 @@ export default function LandingPage() {
               </Button>
             )}
 
-            <Button
-              component="a"
-              href="https://farhanr22.github.io/ZeroProof/"
-              target="_blank"
-              variant="outlined"
-              endIcon={<OpenInNewIcon fontSize="small" />}
-              sx={{ 
-                color: 'text.secondary', 
-                px: 3, 
-                py: 1.5, 
-                borderColor: BORDER_COLOR,
-                transition: 'all 0s',
-                '&:hover': { color: 'text.primary', borderColor: 'text.primary', bgcolor: 'transparent' } 
-              }}
-            >
-              Client Web App
-            </Button>
+            <Stack direction="row" spacing={1.5}>
+              <Button
+                component="a"
+                href="https://farhanr22.github.io/ZeroProof/"
+                target="_blank"
+                variant="outlined"
+                endIcon={<OpenInNewIcon fontSize="small" />}
+                sx={{ 
+                  color: 'text.secondary', 
+                  px: 2, 
+                  py: 1.5, 
+                  borderColor: BORDER_COLOR,
+                  transition: 'all 0s',
+                  flexGrow: 1,
+                  '&:hover': { color: 'text.primary', borderColor: 'text.primary', bgcolor: 'transparent' } 
+                }}
+              >
+                Client Web App
+              </Button>
 
-            <IconButton
-              variant="outlined"
-              component="a" href="https://github.com/farhanr22/ZeroProof/" target="_blank"
-              sx={{
-                border: `1px solid ${BORDER_COLOR}`,
-                borderRadius: 1,
-                color: 'text.secondary',
-                p: 1.5,
-                '&:hover': { borderColor: 'text.primary', color: 'text.primary' }
-              }}
-            >
-              <GitHubIcon />
-            </IconButton>
+              <IconButton
+                variant="outlined"
+                component="a" href="https://github.com/farhanr22/ZeroProof/" target="_blank"
+                sx={{
+                  border: `1px solid ${BORDER_COLOR}`,
+                  borderRadius: 1,
+                  color: 'text.secondary',
+                  p: 1.5,
+                  flexShrink: 0,
+                  '&:hover': { borderColor: 'text.primary', color: 'text.primary' }
+                }}
+              >
+                <GitHubIcon />
+              </IconButton>
+            </Stack>
           </Stack>
         </Container>
       </Box>
@@ -548,7 +562,7 @@ export default function LandingPage() {
             Zero-Trust Anonymous Feedback &middot; Open Source &middot; No warranty implied
           </Typography>
           <Typography variant="body2" color="text.secondary" mb={2}>
-            Build by Team SnackOverflow @ Binary V2.
+            Build by Team SnackOverflow @ <a href="https://binaryvtwo.devfolio.co" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Binary V2</a>.
           </Typography>
           <IconButton
             component="a"

@@ -10,6 +10,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from '../hooks/useAuth.jsx'; 
 import { campaignsAPI } from '../api/Client.js';
+import logo from '../assets/logo.svg';
+
+const NAVBAR_ACCENT = '#3B82F6'; // Matching LandingPage ACCENT
 
 export default function Navbar() {
   const location = useLocation();
@@ -104,10 +107,11 @@ export default function Navbar() {
   return (
     <AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: '1px solid #E2E8F0', backgroundColor: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(12px)', zIndex: theme.zIndex.appBar }}>
       <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: { xs: 64, sm: 72 } }}>
+        <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: { xs: 55, sm: 65 } }}>
           
-          <Box component={RouterLink} to={user ? "/campaigns" : "/"} sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none', color: 'primary.main', transition: 'all 0.2s', '&:hover': { opacity: 0.8 } }}>
-            <Typography variant="h6" fontWeight="bold" letterSpacing={-0.5} sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
+          <Box component={RouterLink} to={user ? "/campaigns" : "/"} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none', transition: 'all 0.2s', '&:hover': { opacity: 0.8 } }}>
+            <Box component="img" src={logo} sx={{ width: 32, height: 32 }} />
+            <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' }, fontFamily: '"IBM Plex Mono", monospace', color: NAVBAR_ACCENT, letterSpacing: '-0.02em' }}>
               ZeroProof
             </Typography>
           </Box>
