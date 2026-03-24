@@ -38,21 +38,25 @@ export default function Navbar() {
       return;
     }
 
-    // Check localStorage cache first
     const cacheKey = `campaign_mode_${campaignId}`;
     const cached = localStorage.getItem(cacheKey);
     if (cached) setCampaignMode(cached);
 
-    // Always fetch fresh from API and update cache
-    campaignsAPI.get(campaignId)
-      .then(data => {
-        const mode = data.campaign.mode;
-        setCampaignMode(mode);
-        localStorage.setItem(cacheKey, mode);
-      })
-      .catch(() => {
-        // If fetch fails, keep cached value
-      });
+    const fetchMode = () => {
+      campaignsAPI.get(campaignId)
+        .then(data => {
+          const mode = data.campaign.mode;
+          setCampaignMode(mode);
+          localStorage.setItem(cacheKey, mode);
+        })
+        .catch(() => {});
+    };
+
+    fetchMode();
+    
+    // Listen for manual trigger (e.g. from CampaignOverview after activation)
+    window.addEventListener('campaignUpdate', fetchMode);
+    return () => window.removeEventListener('campaignUpdate', fetchMode);
   }, [user, campaignId, location.pathname]);
 
   const navLinkStyle = {

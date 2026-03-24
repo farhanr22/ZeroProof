@@ -196,7 +196,7 @@ export default function ManageContacts() {
 
                 <Button 
                   variant="contained" 
-                  color="primary"
+                  color="secondary"
                   size="large"
                   startIcon={isAdding ? <CircularProgress size={20} color="inherit" /> : <PersonAddIcon />} 
                   onClick={handleBulkAdd} 

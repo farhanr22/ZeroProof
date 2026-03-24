@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Container, Typography, Button, Paper, Box, Divider, Skeleton, Alert, CircularProgress } from '@mui/material';
+import { Container, Typography, Button, Paper, Box, Divider, Skeleton, Alert, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { campaignsAPI } from '../api/Client.js';
 
 export default function CampaignOverview() {
@@ -12,6 +13,8 @@ export default function CampaignOverview() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isActivating, setIsActivating] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmType, setConfirmType] = useState(null); // 'activate' or 'delete'
 
   useEffect(() => {
     loadCampaign();
@@ -31,29 +34,34 @@ export default function CampaignOverview() {
   };
 
   const handleActivate = async () => {
-    if (window.confirm("Are you sure? This generates RSA keys and sends OTPs. It cannot be undone.")) {
-      setIsActivating(true);
-      setError(null);
-      try {
-        const data = await campaignsAPI.activate(id);
-        setCampaign(data.campaign);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsActivating(false);
-      }
+    setIsActivating(true);
+    setError(null);
+    try {
+      const data = await campaignsAPI.activate(id);
+      setCampaign(data.campaign);
+      // Notify global components (like Navbar) to refresh status
+      window.dispatchEvent(new CustomEvent('campaignUpdate'));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsActivating(false);
+      setConfirmOpen(false);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to permanently delete this campaign?")) {
-      try {
-        await campaignsAPI.delete(id);
-        navigate('/campaigns');
-      } catch (err) {
-        setError(err.message);
-      }
+    try {
+      await campaignsAPI.delete(id);
+      navigate('/campaigns');
+    } catch (err) {
+      setError(err.message);
+      setConfirmOpen(false);
     }
+  };
+
+  const openConfirm = (type) => {
+    setConfirmType(type);
+    setConfirmOpen(true);
   };
 
   if (isLoading) {
@@ -120,17 +128,49 @@ export default function CampaignOverview() {
             <Button
               variant="contained" color="success" size="large" sx={{ fontWeight: 'bold' }}
               startIcon={isActivating ? <CircularProgress size={18} color="inherit" /> : <WarningAmberIcon />}
-              onClick={handleActivate}
+              onClick={() => openConfirm('activate')}
               disabled={isActivating}
             >
-              Deploy Campaign
+              Activate Campaign
             </Button>
           )}
-          <Button variant="outlined" color="error" size="large" onClick={handleDelete} sx={{ fontWeight: 'bold' }}>
+          <Button 
+            variant="outlined" color="error" size="large" 
+            onClick={() => openConfirm('delete')} 
+            sx={{ fontWeight: 'bold' }}
+            startIcon={<DeleteOutlineIcon />}
+          >
             Delete
           </Button>
         </Box>
       </Box>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmOpen} onClose={() => !isActivating && setConfirmOpen(false)} maxWidth="xs">
+        <DialogTitle fontWeight="bold">
+          {confirmType === 'activate' ? 'Activate Campaign?' : 'Delete Campaign?'}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText color="text.primary">
+            {confirmType === 'activate' 
+              ? 'Are you sure? This generates RSA keys and sends OTPs to all respondents. It cannot be undone.'
+              : 'Are you sure you want to permanently delete this campaign? All data, contacts, and questions will be lost forever.'}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 1 }}>
+          <Button onClick={() => setConfirmOpen(false)} color="inherit" disabled={isActivating}>Cancel</Button>
+          <Button 
+            onClick={confirmType === 'activate' ? handleActivate : handleDelete} 
+            color={confirmType === 'activate' ? 'success' : 'error'} 
+            variant="contained"
+            disabled={isActivating}
+            autoFocus
+          >
+            {isActivating ? <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} /> : null}
+            {confirmType === 'activate' ? 'Activate Now' : 'Delete Permanently'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Large section navigation cards */}
       <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>

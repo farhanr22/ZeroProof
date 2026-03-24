@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Container, Typography, Button, Box, Dialog, DialogTitle,
-  DialogContent, DialogActions, TextField, Paper, IconButton, Tooltip,
+  DialogContent, DialogContentText, DialogActions, TextField, Paper, IconButton, Tooltip,
   Skeleton, Alert, CircularProgress
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -25,6 +25,10 @@ export default function Campaigns() {
   const [newCampaignName, setNewCampaignName] = useState('');
   const [newCampaignDesc, setNewCampaignDesc] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmType, setConfirmType] = useState(null); // 'activate' or 'delete'
+  const [targetId, setTargetId] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // 1. Load Campaigns from API
   useEffect(() => {
@@ -73,27 +77,39 @@ export default function Campaigns() {
   };
 
   // 3. Delete Campaign
-  const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to permanently delete this campaign?")) {
-      try {
-        await campaignsAPI.delete(id);
-        setCampaigns(campaigns.filter(c => c._id !== id));
-      } catch (err) {
-        setError(err.message);
-      }
+  const handleDelete = async () => {
+    setIsProcessing(true);
+    try {
+      await campaignsAPI.delete(targetId);
+      setCampaigns(campaigns.filter(c => c._id !== targetId));
+      setConfirmOpen(false);
+    } catch (err) {
+      setError(err.message);
+      setConfirmOpen(false);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   // 4. Enable Campaign (Draft to Active — irreversible)
-  const handleActivate = async (id) => {
-    if (window.confirm("Enable this campaign? This generates RSA keys, OTPs, and prevents further edits. It cannot be undone.")) {
-      try {
-        const data = await campaignsAPI.activate(id);
-        setCampaigns(campaigns.map(c => c._id === id ? data.campaign : c));
-      } catch (err) {
-        setError(err.message);
-      }
+  const handleActivate = async () => {
+    setIsProcessing(true);
+    try {
+      const data = await campaignsAPI.activate(targetId);
+      setCampaigns(campaigns.map(c => c._id === targetId ? data.campaign : c));
+      setConfirmOpen(false);
+    } catch (err) {
+      setError(err.message);
+      setConfirmOpen(false);
+    } finally {
+      setIsProcessing(false);
     }
+  };
+
+  const openConfirm = (id, type) => {
+    setTargetId(id);
+    setConfirmType(type);
+    setConfirmOpen(true);
   };
 
   return (
@@ -109,7 +125,7 @@ export default function Campaigns() {
         <Typography variant="h4" component="h1" fontWeight="bold">
           Campaigns
         </Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setIsModalOpen(true)}>
+        <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={() => setIsModalOpen(true)}>
           New Campaign
         </Button>
       </Box>
@@ -215,7 +231,7 @@ export default function Campaigns() {
 
                     {/* Enable Button */}
                     <Tooltip title="Enable Campaign">
-                      <IconButton color="success" onClick={() => handleActivate(camp._id)}>
+                      <IconButton color="success" onClick={() => openConfirm(camp._id, 'activate')}>
                         <PlayCircleOutlineIcon />
                       </IconButton>
                     </Tooltip>
@@ -242,7 +258,7 @@ export default function Campaigns() {
 
                 {/* Delete Button (Always visible) */}
                 <Tooltip title="Delete Campaign">
-                  <IconButton color="error" onClick={() => handleDelete(camp._id)}>
+                  <IconButton color="error" onClick={() => openConfirm(camp._id, 'delete')}>
                     <DeleteOutlineIcon />
                   </IconButton>
                 </Tooltip>
@@ -275,11 +291,38 @@ export default function Campaigns() {
           </DialogContent>
           <DialogActions sx={{ p: 3, pt: 0 }}>
             <Button onClick={() => setIsModalOpen(false)} color="inherit" sx={{ fontWeight: 'bold' }} disabled={isCreating}>Cancel</Button>
-            <Button type="submit" variant="contained" disabled={isCreating}>
+            <Button type="submit" variant="contained" color="secondary" disabled={isCreating}>
               {isCreating ? <CircularProgress size={20} color="inherit" /> : 'Create'}
             </Button>
           </DialogActions>
         </form>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmOpen} onClose={() => !isProcessing && setConfirmOpen(false)} maxWidth="xs">
+        <DialogTitle fontWeight="bold">
+          {confirmType === 'activate' ? 'Enable Campaign?' : 'Delete Campaign?'}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText color="text.primary">
+            {confirmType === 'activate' 
+              ? 'Enable this campaign? This generates RSA keys and sends OTPs to all respondents. It cannot be undone.'
+              : 'Are you sure you want to permanently delete this campaign? All data, contacts, and questions will be lost forever.'}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, pt: 1 }}>
+          <Button onClick={() => setConfirmOpen(false)} color="inherit" disabled={isProcessing}>Cancel</Button>
+          <Button 
+            onClick={confirmType === 'activate' ? handleActivate : handleDelete} 
+            color={confirmType === 'activate' ? 'success' : 'error'} 
+            variant="contained"
+            disabled={isProcessing}
+            autoFocus
+          >
+            {isProcessing ? <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} /> : null}
+            {confirmType === 'activate' ? 'Enable Now' : 'Delete'}
+          </Button>
+        </DialogActions>
       </Dialog>
     </Container>
   );

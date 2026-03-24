@@ -192,7 +192,7 @@ export default function ManageQuestions() {
             <Button variant="outlined" color="primary" startIcon={<AutoAwesomeIcon />} onClick={() => setIsAiModalOpen(true)} disabled={isSaving || isAiGenerating}>
               Generate
             </Button>
-            <Button variant="contained" color="primary" startIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />} onClick={handleSave} disabled={isSaving || isAiGenerating}>
+            <Button variant="contained" color="secondary" startIcon={isSaving ? <CircularProgress size={18} color="inherit" /> : <SaveIcon />} onClick={handleSave} disabled={isSaving || isAiGenerating}>
               Save All
             </Button>
           </Box>
@@ -273,7 +273,7 @@ export default function ManageQuestions() {
           <Button onClick={() => setIsAiModalOpen(false)} color="inherit" disabled={isAiGenerating}>
             Cancel
           </Button>
-          <Button onClick={handleAiGenerate} variant="contained" color="primary" disabled={!aiPrompt.trim() || isAiGenerating} startIcon={isAiGenerating ? <CircularProgress size={18} color="inherit" /> : <AutoAwesomeIcon />}>
+          <Button onClick={handleAiGenerate} variant="contained" color="secondary" disabled={!aiPrompt.trim() || isAiGenerating} startIcon={isAiGenerating ? <CircularProgress size={18} color="inherit" /> : <AutoAwesomeIcon />}>
             {isAiGenerating ? "Generating..." : "Generate"}
           </Button>
         </DialogActions>
