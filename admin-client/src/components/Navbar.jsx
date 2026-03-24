@@ -113,7 +113,16 @@ export default function Navbar() {
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ justifyContent: 'space-between', minHeight: { xs: 55, sm: 65 } }}>
           
-          <Box component={RouterLink} to={user ? "/campaigns" : "/"} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none', transition: 'all 0.2s', '&:hover': { opacity: 0.8 } }}>
+          {/* Brand Logo & Name navigation logic */}
+          <Box 
+            component={RouterLink} 
+            to={
+              location.pathname === "/campaigns" 
+                ? "/" 
+                : (location.pathname.startsWith("/campaigns") ? "/campaigns" : "/")
+            } 
+            sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none', transition: 'all 0.2s', '&:hover': { opacity: 0.8 } }}
+          >
             <Box component="img" src={logo} sx={{ width: 32, height: 32 }} />
             <Typography variant="h6" fontWeight="bold" sx={{ fontSize: { xs: '1.25rem', md: '1.5rem' }, fontFamily: '"IBM Plex Mono", monospace', color: NAVBAR_ACCENT, letterSpacing: '-0.02em' }}>
               ZeroProof
