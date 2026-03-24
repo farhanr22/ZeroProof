@@ -55,13 +55,15 @@ const summarizeTextResponses = async (questionText, texts) => {
 Here are the responses (up to 20):
 ${sample.map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
-Provide a concise 4-7 sentence summary of the key themes and sentiments expressed. Do not list individual responses; synthesize them.`;
+Provide a concise 4-7 sentence summary of the key themes and sentiments expressed. Do not list individual responses. 
+If there is limited information then create your response only based on what is available, without embellishments. It's okay to provide a shorter response (1-2 sentences).`;
 
   const completion = await openai.chat.completions.create({
     model: AI_MODEL,
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.4,
   });
+  console.log(completion.choices[0].message.content)
 
   return completion.choices[0].message.content.trim();
 };
