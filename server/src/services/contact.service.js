@@ -4,6 +4,18 @@ import { ApiError } from '../core/errors.js';
 
 export const listContacts = async (admin_id, campaign_id) => {
   await getCampaignById(admin_id, campaign_id);
+  const otp_service_enabled = process.env.OTP_SERVICE_ENABLED === 'true';
+
+  if (!otp_service_enabled) {
+    const contacts = await Contact.find({ campaign_id }).select('value _id otp');
+    const SELF_DOMAIN = process.env.SELF_DOMAIN || 'http://localhost:3000';
+    return contacts.map(c => ({
+      _id: c._id,
+      value: c.value,
+      access_url: c.otp ? `${SELF_DOMAIN}/start?otp=${c.otp}` : null
+    }));
+  }
+  
   return Contact.find({ campaign_id }).select('value _id');
 };
 

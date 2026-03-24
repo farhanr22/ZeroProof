@@ -73,17 +73,12 @@ export default function Navbar() {
           {isInsideCampaign && campaignMode ? (
             <>
               <NavItem to={`/campaigns/${campaignId}`} label="Overview" isMobile={isMobileView} />
-              {campaignMode === 'draft' ? (
-                <>
+
                   <NavItem to={`/campaigns/${campaignId}/contacts`} label="Contacts" isMobile={isMobileView} />
                   <NavItem to={`/campaigns/${campaignId}/questions`} label="Questions" isMobile={isMobileView} />
-                </>
-              ) : (
-                <>
                   <NavItem to={`/campaigns/${campaignId}/responses`} label="Responses" isMobile={isMobileView} />
                   <NavItem to={`/campaigns/${campaignId}/insights`} label="Insights" isMobile={isMobileView} />
-                </>
-              )}
+
             </>
           ) : (
             <NavItem to="/campaigns" label="All Campaigns" isMobile={isMobileView} />

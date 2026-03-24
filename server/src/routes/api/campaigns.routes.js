@@ -17,7 +17,8 @@ router.use('/:id/questions', questionsRoutes);
 router.get('/', asyncHandler(async (req, res) => {
   req.log.info({ user_id: req.user.user_id }, 'Listing campaigns');
   const campaigns = await campaignService.listCampaigns(req.user.user_id);
-  sendResponse(res, { campaigns });
+  const otp_service_enabled = process.env.OTP_SERVICE_ENABLED === 'true';
+  sendResponse(res, { campaigns, config: { otp_service_enabled } });
 }));
 
 router.post('/', validate(createCampaignSchema), asyncHandler(async (req, res) => {
@@ -28,7 +29,8 @@ router.post('/', validate(createCampaignSchema), asyncHandler(async (req, res) =
 
 router.get('/:id', asyncHandler(async (req, res) => {
   const campaign = await campaignService.getCampaignById(req.user.user_id, req.params.id);
-  sendResponse(res, { campaign });
+  const otp_service_enabled = process.env.OTP_SERVICE_ENABLED === 'true';
+  sendResponse(res, { campaign, config: { otp_service_enabled } });
 }));
 
 router.post('/:id/activate', asyncHandler(async (req, res) => {

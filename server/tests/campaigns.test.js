@@ -47,7 +47,7 @@ describe('Campaigns API /api/campaigns', () => {
       expect(res.body.error_message).toBe('A campaign with this name already exists');
     });
 
-    it('User A lists their campaigns and sees Campaign A', async () => {
+    it('User A lists their campaigns and sees Campaign A and config status', async () => {
       const res = await request(app)
         .get('/api/campaigns')
         .set('Authorization', `Bearer ${userAToken}`);
@@ -55,6 +55,9 @@ describe('Campaigns API /api/campaigns', () => {
       expect(res.status).toBe(200);
       expect(res.body.data.campaigns.length).toBe(1);
       expect(res.body.data.campaigns[0]._id).toBe(campaignId);
+      // Verify OTP service status is present
+      expect(res.body.data.config).toBeDefined();
+      expect(typeof res.body.data.config.otp_service_enabled).toBe('boolean');
     });
 
     it('User B lists their campaigns and gets an empty list (Ownership Test)', async () => {

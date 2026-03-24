@@ -20,6 +20,7 @@ export default function Campaigns() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState(null);
+  const [otpServiceEnabled, setOtpServiceEnabled] = useState(true);
 
   // Creation Form State
   const [newCampaignName, setNewCampaignName] = useState('');
@@ -41,6 +42,7 @@ export default function Campaigns() {
     try {
       const data = await campaignsAPI.list();
       setCampaigns(data.campaigns);
+      if (data.config) setOtpServiceEnabled(data.config.otp_service_enabled);
     } catch (err) {
       setError(err.message);
     } finally {

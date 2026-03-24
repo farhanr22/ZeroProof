@@ -15,6 +15,7 @@ export default function CampaignOverview() {
   const [isActivating, setIsActivating] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmType, setConfirmType] = useState(null); // 'activate' or 'delete'
+  const [otpServiceEnabled, setOtpServiceEnabled] = useState(true);
 
   useEffect(() => {
     loadCampaign();
@@ -26,6 +27,7 @@ export default function CampaignOverview() {
     try {
       const data = await campaignsAPI.get(id);
       setCampaign(data.campaign);
+      if (data.config) setOtpServiceEnabled(data.config.otp_service_enabled);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -94,20 +96,21 @@ export default function CampaignOverview() {
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>{error}</Alert>
       )}
 
+
       {/* Header section */}
       <Box mb={4} display="flex" flexDirection={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="flex-start" gap={2}>
         <Box>
           <Box display="flex" alignItems="center" gap={2} mb={1}>
             <Typography variant="h4" fontWeight="bold">{campaign.name}</Typography>
             {/* Status Pill Indicator */}
-            <Box sx={{ 
-              display: 'inline-flex', alignItems: 'center', gap: 1, 
-              px: 1.5, py: 0.5, borderRadius: 1.5, 
+            <Box sx={{
+              display: 'inline-flex', alignItems: 'center', gap: 1,
+              px: 1.5, py: 0.5, borderRadius: 1.5,
               bgcolor: campaign.mode === 'active' ? 'rgba(16, 185, 129, 0.1)' : '#F1F5F9',
               border: '1px solid', borderColor: campaign.mode === 'active' ? '#10B981' : '#E2E8F0'
             }}>
-              <Box sx={{ 
-                width: 8, height: 8, borderRadius: '50%', 
+              <Box sx={{
+                width: 8, height: 8, borderRadius: '50%',
                 bgcolor: campaign.mode === 'active' ? '#10B981' : '#9CA3AF',
                 boxShadow: campaign.mode === 'active' ? '0 0 8px rgba(16, 185, 129, 0.8)' : 'none'
               }} />
@@ -134,9 +137,9 @@ export default function CampaignOverview() {
               Activate Campaign
             </Button>
           )}
-          <Button 
-            variant="outlined" color="error" size="large" 
-            onClick={() => openConfirm('delete')} 
+          <Button
+            variant="outlined" color="error" size="large"
+            onClick={() => openConfirm('delete')}
             sx={{ fontWeight: 'bold' }}
             startIcon={<DeleteOutlineIcon />}
           >
@@ -152,16 +155,16 @@ export default function CampaignOverview() {
         </DialogTitle>
         <DialogContent>
           <DialogContentText color="text.primary">
-            {confirmType === 'activate' 
+            {confirmType === 'activate'
               ? 'Are you sure? This generates RSA keys and sends OTPs to all respondents. It cannot be undone.'
               : 'Are you sure you want to permanently delete this campaign? All data, contacts, and questions will be lost forever.'}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 2, pt: 1 }}>
           <Button onClick={() => setConfirmOpen(false)} color="inherit" disabled={isActivating}>Cancel</Button>
-          <Button 
-            onClick={confirmType === 'activate' ? handleActivate : handleDelete} 
-            color={confirmType === 'activate' ? 'success' : 'error'} 
+          <Button
+            onClick={confirmType === 'activate' ? handleActivate : handleDelete}
+            color={confirmType === 'activate' ? 'success' : 'error'}
             variant="contained"
             disabled={isActivating}
             autoFocus
@@ -171,6 +174,24 @@ export default function CampaignOverview() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Manual distribution warning */}
+      {!otpServiceEnabled && campaign.mode === 'active' && (
+        <Alert
+          severity="warning"
+          sx={{ mb: 4, '& .MuiAlert-message': { width: '100%' } }}
+          variant="outlined"
+        >
+          <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+            OTP Sender service is currently not operational.
+          </Typography>
+          <Typography variant="body2">
+            You will need to forward the one-time links to the respondents yourself.
+            Find and copy all links on the <Box component={Link} to={`/campaigns/${id}/contacts`} sx={{ color: 'primary.main', fontWeight: 'bold' }}>respondents page</Box>.
+          </Typography>
+        </Alert>
+      )}
+
 
       {/* Large section navigation cards */}
       <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
